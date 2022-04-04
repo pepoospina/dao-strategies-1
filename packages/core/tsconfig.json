@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ES2017"],
+    "sourceMap": true,
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "incremental": true,
+    // "inlineSources": true,
+    "allowJs": false,
+    "declarationMap": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "rootDir": "./src",
+    "baseUrl": "./",
+    "outDir": "dist",
+    "declarationDir": "dist/types",
+    "types": ["node"],
+    "paths": {
+      "~~/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["**/node_modules", "node_modules"]
+}
