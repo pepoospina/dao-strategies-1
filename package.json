@@ -1,0 +1,101 @@
+{
+  "name": "@scaffold-eth/typescript",
+  "version": "0.2.0",
+  "keywords": [
+    "ethereum",
+    "react",
+    "uniswap",
+    "workspaces",
+    "yarn"
+  ],
+  "private": true,
+  "scripts": {
+    "build": "yarn workspace @dao-strategies/frontend build",
+    "serve": "yarn workspace @dao-strategies/frontend serve",
+    "chain": "yarn workspace @dao-strategies/contracts chain",
+    "fork": "yarn workspace @dao-strategies/contracts fork",
+    "node": "yarn workspace @dao-strategies/contracts chain",
+    "test": "yarn workspace @dao-strategies/contracts test",
+    "start": "yarn workspace @dao-strategies/frontend start",
+    "compile": "yarn workspace @dao-strategies/contracts compile",
+    "contracts:build": "yarn workspace @dao-strategies/contracts hardhat compile && yarn workspace @dao-strategies/frontend contracts:external",
+    "contracts:rebuild": "yarn workspace @dao-strategies/contracts hardhat clean && yarn contracts:build",
+    "export": "yarn workspace @dao-strategies/contracts export",
+    "deploy": "yarn workspace @dao-strategies/contracts deploy",
+    "watch": "yarn workspace @dao-strategies/contracts watch",
+    "accounts": "yarn workspace @dao-strategies/contracts accounts",
+    "balance": "yarn workspace @dao-strategies/contracts balance",
+    "send": "yarn workspace @dao-strategies/contracts send",
+    "ipfs": "yarn workspace @dao-strategies/frontend ipfs",
+    "surge": "yarn workspace @dao-strategies/frontend surge",
+    "s3": "yarn workspace @dao-strategies/frontend s3",
+    "ship": "yarn workspace @dao-strategies/frontend ship",
+    "generate": "yarn workspace @dao-strategies/contracts generate",
+    "account": "yarn workspace @dao-strategies/contracts account",
+    "mine": "cd packages/contracts && npx hardhat mine",
+    "wallet": "cd packages/contracts && npx hardhat wallet",
+    "fundedwallet": "cd packages/contracts && npx hardhat fundedwallet",
+    "flatten": "cd packages/contracts && npx hardhat flatten",
+    "clean": "cd packages/contracts && npx hardhat clean",
+    "run-graph-node": "yarn workspace @scaffold-eth/services run-graph-node",
+    "remove-graph-node": "yarn workspace @scaffold-eth/services remove-graph-node",
+    "clean-graph-node": "yarn workspace @scaffold-eth/services clean-graph-node",
+    "graph-prepare": "mustache packages/subgraph/config/config.json packages/subgraph/src/subgraph.template.yaml > packages/subgraph/subgraph.yaml",
+    "graph-codegen": "yarn workspace @scaffold-eth/subgraph graph codegen",
+    "graph-build": "yarn workspace @scaffold-eth/subgraph graph build",
+    "graph-create-local": "yarn workspace @scaffold-eth/subgraph graph create --node http://localhost:8020/ scaffold-eth/your-contract",
+    "graph-remove-local": "yarn workspace @scaffold-eth/subgraph graph remove --node http://localhost:8020/ scaffold-eth/your-contract",
+    "graph-deploy-local": "yarn workspace @scaffold-eth/subgraph graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 scaffold-eth/your-contract",
+    "graph-ship-local": "yarn graph-prepare && yarn graph-codegen && yarn graph-deploy-local",
+    "deploy-and-graph": "yarn deploy && yarn graph-ship-local",
+    "theme": "yarn workspace @scaffold-eth/react-app theme",
+    "watch-theme": "yarn workspace @scaffold-eth/react-app watch",
+    "prepare": "husky install",
+    "postinstall": "husky install"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/contracts",
+      "packages/core",
+      "packages/frontend",
+      "packages/services/*",
+      "packages/subgraph",
+      "packages/test-core-import"
+    ]
+  },
+  "packageManager": "yarn@3.2.0",
+  "devDependencies": {
+    "eslint": "^8.9.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.4",
+    "prettier": "^2.5.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "shx": "^0.3.4"
+  },
+  "lint-staged": {
+    "packages/frontend/src/**/*.{ts,tsx}": [
+      "yarn workspace @dao-strategies/frontend lint --fix",
+      "yarn workspace @dao-strategies/frontend format"
+    ],
+    "packages/contracts/test/**/*.ts": [
+      "yarn workspace @dao-strategies/contracts lint --fix",
+      "yarn workspace @dao-strategies/contracts format"
+    ],
+    "packages/contracts/helpers/**/*.ts": [
+      "yarn workspace @dao-strategies/contracts lint --fix",
+      "yarn workspace @dao-strategies/contracts format"
+    ],
+    "packages/contracts/scripts/**/*.ts": [
+      "yarn workspace @dao-strategies/contracts lint --fix",
+      "yarn workspace @dao-strategies/contracts format"
+    ],
+    "packages/contracts/deploy/**/*.ts": [
+      "yarn workspace @dao-strategies/contracts lint --fix",
+      "yarn workspace @dao-strategies/contracts format"
+    ],
+    "packages/contracts/**/*.sol": [
+      "yarn workspace @dao-strategies/contracts format",
+      "yarn workspace @dao-strategies/contracts solhint --fix"
+    ]
+  }
+}
