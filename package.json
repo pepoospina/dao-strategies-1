@@ -60,7 +60,9 @@
       "packages/frontend",
       "packages/services/*",
       "packages/subgraph",
-      "packages/test-core-import"
+      "packages/test-core-import",
+      "packages/eth-libs/eth-hooks",
+      "packages/eth-libs/eth-components"
     ]
   },
   "packageManager": "yarn@3.2.0",

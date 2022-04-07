@@ -6,7 +6,7 @@ import { useEthersContext } from 'eth-hooks/context';
 import { ethers } from 'ethers';
 import { FC, useContext } from 'react';
 
-import { useAppContracts } from '~~/config/contractContext';
+import { useAppContracts, useLoadAppContracts } from '~~/config/contractContext';
 import { getMerkleTree } from '~~/services/strategyComputation';
 
 const RANDOM_BYTES32 = '0x5fd924625f6ab16a19cc9807c7c506ae1813490e4ba675f843d5a10e0baacdb8';
