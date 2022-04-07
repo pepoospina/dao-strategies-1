@@ -26,7 +26,11 @@
     "jsx": "react-jsxdev",
     "jsxImportSource": "@emotion/react",
     "paths": {
-      "~~/*": ["./src/*"]
+      "~~/*": ["./src/*"],
+      "eth-hooks": ["./node_modules/eth-hooks/lib"],
+      "eth-hooks/*": ["./node_modules/eth-hooks/lib/*"],
+      "eth-components": ["./node_modules/eth-components/lib"],
+      "eth-components/*": ["./node_modules/eth-components/lib/*"]
     }
   },
   "include": ["src", "src/helpers/__global.ts", "vite.config.ts"],
