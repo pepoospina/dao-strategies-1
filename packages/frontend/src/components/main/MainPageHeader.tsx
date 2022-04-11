@@ -1,6 +1,8 @@
 import { Button, PageHeader } from 'antd';
-import { EthersModalConnector, useEthersContext } from 'eth-hooks/context';
+import { useEthersContext } from 'eth-hooks/context';
 import { FC } from 'react';
+
+import { useScaffoldProviders } from './hooks/useScaffoldAppProviders';
 
 export interface IMainPageHeaderProps {
   dum?: any;
@@ -8,11 +10,13 @@ export interface IMainPageHeaderProps {
 
 export const MainPageHeader: FC<IMainPageHeaderProps> = (props) => {
   const ethersContext = useEthersContext();
-
-  const connector = new EthersModalConnector({});
+  const providers = useScaffoldProviders();
+  const connector = providers.createLoginConnector();
 
   const connect = (): void => {
-    ethersContext.openModal(connector);
+    if (connector) {
+      ethersContext.openModal(connector);
+    }
   };
 
   const left = (

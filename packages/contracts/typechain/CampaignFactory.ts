@@ -41,13 +41,24 @@ export interface CampaignFactoryInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "deploy", data: BytesLike): Result;
 
   events: {
-    "CampaignCreated(address)": EventFragment;
+    "CampaignCreated(address,address,bytes32,bytes32,uint256,address,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CampaignCreated"): EventFragment;
 }
 
-export type CampaignCreatedEvent = TypedEvent<[string], { arg0: string }>;
+export type CampaignCreatedEvent = TypedEvent<
+  [string, string, string, string, BigNumber, string, string],
+  {
+    campaignAddress: string;
+    owner: string;
+    strategyHash: string;
+    merkleRoot: string;
+    totalSupply: BigNumber;
+    assetAddress: string;
+    salt: string;
+  }
+>;
 
 export type CampaignCreatedEventFilter = TypedEventFilter<CampaignCreatedEvent>;
 
@@ -122,8 +133,24 @@ export interface CampaignFactory extends BaseContract {
   };
 
   filters: {
-    "CampaignCreated(address)"(arg0?: null): CampaignCreatedEventFilter;
-    CampaignCreated(arg0?: null): CampaignCreatedEventFilter;
+    "CampaignCreated(address,address,bytes32,bytes32,uint256,address,bytes32)"(
+      campaignAddress?: null,
+      owner?: null,
+      strategyHash?: null,
+      merkleRoot?: null,
+      totalSupply?: null,
+      assetAddress?: null,
+      salt?: null
+    ): CampaignCreatedEventFilter;
+    CampaignCreated(
+      campaignAddress?: null,
+      owner?: null,
+      strategyHash?: null,
+      merkleRoot?: null,
+      totalSupply?: null,
+      assetAddress?: null,
+      salt?: null
+    ): CampaignCreatedEventFilter;
   };
 
   estimateGas: {
