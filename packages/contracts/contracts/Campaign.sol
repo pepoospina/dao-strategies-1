@@ -8,17 +8,20 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
  * @title Campaign
  */
 contract Campaign {
-    uint256 public totalShares;
-    uint256 public totalClaimed;
-    bytes32 public strategyHash;
-    address public guardian;
-    uint256 public evaluationPeriodEnd;
-    bytes32 public merkleRoot;
-    address public oracle;
-    bool public campaignCancelled;
-    bool public rewardsCalculated;
+    struct SharesData {
+        uint256 totalShares;
+        bytes32 sharesMerkleRoot;
+    }
 
-    mapping(address => uint256) public shares;
+    SharesData shares;
+    bytes32 public uri;
+    address public guardian;
+    address public oracle;
+    uint256 public evaluationPeriodEnd;
+    uint256 public totalClaimed;
+    bool public campaignCancelled;
+    bool public sharesPublished;
+
     mapping(address => uint256) public claimed;
     mapping(address => uint256) public funds;
 
@@ -29,8 +32,8 @@ contract Campaign {
     error OnlyDuringEvaluationPeriod();
     error WithdrawalNotAllowed();
     error WithdrawTransferFailed();
-    error NoFundsForAccount();
-    error RewardsAlreadyCalculated();
+    error NoFunds();
+    error SharesAlreadyPublished();
     error OnlyOracle();
 
     modifier onlyGuardian() {
@@ -48,48 +51,48 @@ contract Campaign {
     }
 
     constructor(
-        uint256 _totalShares,
-        bytes32 _merkleRoot,
-        bool _rewardsCalculated,
-        bytes32 _strategyHash,
+        SharesData memory _shares,
+        bytes32 _uri,
         address _guardian,
+        address _oracle,
+        bool _sharesPublished,
         uint256 _evaluationPeriodDuration
     ) {
         evaluationPeriodEnd = block.timestamp + _evaluationPeriodDuration;
-        totalShares = _totalShares;
-        strategyHash = _strategyHash;
-        merkleRoot = _merkleRoot;
+        shares = _shares;
+        uri = _uri;
         guardian = _guardian;
-        rewardsCalculated = _rewardsCalculated;
+        oracle = _oracle;
+        sharesPublished = _sharesPublished;
     }
 
-    function publishRewardsCalculation(bytes32 _merkleRoot) external onlyOracle {
-        if (rewardsCalculated) {
-            revert RewardsAlreadyCalculated();
+    function publishShares(SharesData memory _shares) external onlyOracle {
+        if (sharesPublished) {
+            revert SharesAlreadyPublished();
         }
-        rewardsCalculated = true;
-        merkleRoot = _merkleRoot;
+        sharesPublished = true;
+        shares = _shares;
     }
 
-    function claimReward(
+    function claim(
         address account,
         uint256 share,
         bytes32[] calldata proof
     ) external {
         bytes32 leaf = keccak256(abi.encodePacked(account, share));
-        if (MerkleProof.verify(proof, merkleRoot, leaf) == false) {
+        if (MerkleProof.verify(proof, shares.sharesMerkleRoot, leaf) == false) {
             revert InvalidProof();
         }
 
         uint256 totalFundsReceived = address(this).balance + totalClaimed;
-        uint256 currentReward = (totalFundsReceived * share) / totalShares - claimed[account];
-        if (currentReward == 0) {
+        uint256 reward = (totalFundsReceived * share) / shares.totalShares - claimed[account];
+        if (reward == 0) {
             revert NoRewardAvailable();
         }
-        claimed[account] += currentReward;
-        totalClaimed += currentReward;
+        claimed[account] += reward;
+        totalClaimed += reward;
 
-        (bool success, ) = account.call{ value: currentReward }("");
+        (bool success, ) = account.call{ value: reward }("");
         if (!success) {
             revert RewardTransferFailed();
         }
@@ -113,7 +116,7 @@ contract Campaign {
 
         uint256 amount = funds[account];
         if (amount == 0) {
-            revert NoFundsForAccount();
+            revert NoFunds();
         }
         funds[account] = 0;
 
@@ -124,6 +127,6 @@ contract Campaign {
     }
 
     function withdrawAllowed() private view returns (bool) {
-        return campaignCancelled || (block.timestamp > evaluationPeriodEnd && !rewardsCalculated);
+        return campaignCancelled || (block.timestamp > evaluationPeriodEnd && !sharesPublished);
     }
 }

@@ -17,22 +17,33 @@ import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
+export declare namespace Campaign {
+  export type SharesDataStruct = {
+    totalShares: BigNumberish;
+    sharesMerkleRoot: BytesLike;
+  };
+
+  export type SharesDataStructOutput = [BigNumber, string] & {
+    totalShares: BigNumber;
+    sharesMerkleRoot: string;
+  };
+}
+
 export interface CampaignInterface extends utils.Interface {
   contractName: "Campaign";
   functions: {
     "campaignCancelled()": FunctionFragment;
     "cancelCampaign()": FunctionFragment;
-    "claimReward(address,uint256,bytes32[])": FunctionFragment;
+    "claim(address,uint256,bytes32[])": FunctionFragment;
     "claimed(address)": FunctionFragment;
     "evaluationPeriodEnd()": FunctionFragment;
     "funds(address)": FunctionFragment;
     "guardian()": FunctionFragment;
-    "merkleRoot()": FunctionFragment;
-    "rewardsCalculated()": FunctionFragment;
-    "shares(address)": FunctionFragment;
-    "strategyHash()": FunctionFragment;
+    "oracle()": FunctionFragment;
+    "publishShares((uint256,bytes32))": FunctionFragment;
+    "sharesPublished()": FunctionFragment;
     "totalClaimed()": FunctionFragment;
-    "totalShares()": FunctionFragment;
+    "uri()": FunctionFragment;
     "withdrawFunds(address)": FunctionFragment;
   };
 
@@ -45,7 +56,7 @@ export interface CampaignInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "claimReward",
+    functionFragment: "claim",
     values: [string, BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(functionFragment: "claimed", values: [string]): string;
@@ -55,27 +66,20 @@ export interface CampaignInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "funds", values: [string]): string;
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
+  encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "merkleRoot",
-    values?: undefined
+    functionFragment: "publishShares",
+    values: [Campaign.SharesDataStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "rewardsCalculated",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "shares", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "strategyHash",
+    functionFragment: "sharesPublished",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "totalClaimed",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "totalShares",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "uri", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdrawFunds",
     values: [string]
@@ -89,10 +93,7 @@ export interface CampaignInterface extends utils.Interface {
     functionFragment: "cancelCampaign",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "claimReward",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claimed", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "evaluationPeriodEnd",
@@ -100,24 +101,20 @@ export interface CampaignInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "funds", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "rewardsCalculated",
+    functionFragment: "publishShares",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "strategyHash",
+    functionFragment: "sharesPublished",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "totalClaimed",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalShares",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawFunds",
     data: BytesLike
@@ -160,7 +157,7 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    claimReward(
+    claim(
       account: string,
       share: BigNumberish,
       proof: BytesLike[],
@@ -175,17 +172,18 @@ export interface Campaign extends BaseContract {
 
     guardian(overrides?: CallOverrides): Promise<[string]>;
 
-    merkleRoot(overrides?: CallOverrides): Promise<[string]>;
+    oracle(overrides?: CallOverrides): Promise<[string]>;
 
-    rewardsCalculated(overrides?: CallOverrides): Promise<[boolean]>;
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    shares(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    strategyHash(overrides?: CallOverrides): Promise<[string]>;
+    sharesPublished(overrides?: CallOverrides): Promise<[boolean]>;
 
     totalClaimed(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    totalShares(overrides?: CallOverrides): Promise<[BigNumber]>;
+    uri(overrides?: CallOverrides): Promise<[string]>;
 
     withdrawFunds(
       account: string,
@@ -199,7 +197,7 @@ export interface Campaign extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  claimReward(
+  claim(
     account: string,
     share: BigNumberish,
     proof: BytesLike[],
@@ -214,17 +212,18 @@ export interface Campaign extends BaseContract {
 
   guardian(overrides?: CallOverrides): Promise<string>;
 
-  merkleRoot(overrides?: CallOverrides): Promise<string>;
+  oracle(overrides?: CallOverrides): Promise<string>;
 
-  rewardsCalculated(overrides?: CallOverrides): Promise<boolean>;
+  publishShares(
+    _shares: Campaign.SharesDataStruct,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  shares(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  strategyHash(overrides?: CallOverrides): Promise<string>;
+  sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
   totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-  totalShares(overrides?: CallOverrides): Promise<BigNumber>;
+  uri(overrides?: CallOverrides): Promise<string>;
 
   withdrawFunds(
     account: string,
@@ -236,7 +235,7 @@ export interface Campaign extends BaseContract {
 
     cancelCampaign(overrides?: CallOverrides): Promise<void>;
 
-    claimReward(
+    claim(
       account: string,
       share: BigNumberish,
       proof: BytesLike[],
@@ -251,17 +250,18 @@ export interface Campaign extends BaseContract {
 
     guardian(overrides?: CallOverrides): Promise<string>;
 
-    merkleRoot(overrides?: CallOverrides): Promise<string>;
+    oracle(overrides?: CallOverrides): Promise<string>;
 
-    rewardsCalculated(overrides?: CallOverrides): Promise<boolean>;
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    shares(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    strategyHash(overrides?: CallOverrides): Promise<string>;
+    sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
     totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-    totalShares(overrides?: CallOverrides): Promise<BigNumber>;
+    uri(overrides?: CallOverrides): Promise<string>;
 
     withdrawFunds(account: string, overrides?: CallOverrides): Promise<void>;
   };
@@ -275,7 +275,7 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    claimReward(
+    claim(
       account: string,
       share: BigNumberish,
       proof: BytesLike[],
@@ -290,17 +290,18 @@ export interface Campaign extends BaseContract {
 
     guardian(overrides?: CallOverrides): Promise<BigNumber>;
 
-    merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
+    oracle(overrides?: CallOverrides): Promise<BigNumber>;
 
-    rewardsCalculated(overrides?: CallOverrides): Promise<BigNumber>;
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    shares(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    strategyHash(overrides?: CallOverrides): Promise<BigNumber>;
+    sharesPublished(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-    totalShares(overrides?: CallOverrides): Promise<BigNumber>;
+    uri(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawFunds(
       account: string,
@@ -315,7 +316,7 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    claimReward(
+    claim(
       account: string,
       share: BigNumberish,
       proof: BytesLike[],
@@ -338,20 +339,18 @@ export interface Campaign extends BaseContract {
 
     guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    rewardsCalculated(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    shares(
-      arg0: string,
-      overrides?: CallOverrides
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    strategyHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    sharesPublished(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalClaimed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    totalShares(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    uri(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdrawFunds(
       account: string,
