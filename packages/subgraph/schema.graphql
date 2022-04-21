@@ -1,0 +1,8 @@
+type Campaign @entity {
+  id: ID!
+  owner: Bytes
+  strategyHash: Bytes
+  merkleRoot: Bytes
+  totalSupply: BigInt
+  assetAddress: Bytes
+}

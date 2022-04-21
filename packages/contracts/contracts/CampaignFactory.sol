@@ -4,7 +4,15 @@ pragma solidity ^0.8.0;
 import "./Campaign.sol";
 
 contract CampaignFactory {
-    event CampaignCreated(address);
+    event CampaignCreated(
+        address campaignAddress,
+        address owner,
+        bytes32 strategyHash,
+        bytes32 merkleRoot,
+        uint256 totalSupply,
+        address assetAddress,
+        bytes32 salt
+    );
 
     // Returns the address of the newly deployed contract
     function deploy(
@@ -21,7 +29,7 @@ contract CampaignFactory {
         address campaignAddress = address(
             new Campaign{ salt: _salt }(_owner, _strategyHash, _merkleRoot, __totalSupply, __asset, _fundTokenDecimals, name, symbol)
         );
-        emit CampaignCreated(campaignAddress);
+        emit CampaignCreated(campaignAddress, _owner, _strategyHash, _merkleRoot, __totalSupply, address(__asset), _salt);
         return campaignAddress;
     }
 }
