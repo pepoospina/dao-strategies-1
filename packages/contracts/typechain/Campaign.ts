@@ -41,6 +41,7 @@ export interface CampaignInterface extends utils.Interface {
     "guardian()": FunctionFragment;
     "oracle()": FunctionFragment;
     "publishShares((uint256,bytes32))": FunctionFragment;
+    "shares()": FunctionFragment;
     "sharesPublished()": FunctionFragment;
     "totalClaimed()": FunctionFragment;
     "uri()": FunctionFragment;
@@ -71,6 +72,7 @@ export interface CampaignInterface extends utils.Interface {
     functionFragment: "publishShares",
     values: [Campaign.SharesDataStruct]
   ): string;
+  encodeFunctionData(functionFragment: "shares", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "sharesPublished",
     values?: undefined
@@ -106,6 +108,7 @@ export interface CampaignInterface extends utils.Interface {
     functionFragment: "publishShares",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "sharesPublished",
     data: BytesLike
@@ -179,6 +182,12 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    shares(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+    >;
+
     sharesPublished(overrides?: CallOverrides): Promise<[boolean]>;
 
     totalClaimed(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -219,6 +228,12 @@ export interface Campaign extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  shares(
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+  >;
+
   sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
   totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
@@ -256,6 +271,12 @@ export interface Campaign extends BaseContract {
       _shares: Campaign.SharesDataStruct,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    shares(
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+    >;
 
     sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
@@ -296,6 +317,8 @@ export interface Campaign extends BaseContract {
       _shares: Campaign.SharesDataStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    shares(overrides?: CallOverrides): Promise<BigNumber>;
 
     sharesPublished(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -345,6 +368,8 @@ export interface Campaign extends BaseContract {
       _shares: Campaign.SharesDataStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    shares(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     sharesPublished(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

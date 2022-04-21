@@ -13,7 +13,7 @@ contract Campaign {
         bytes32 sharesMerkleRoot;
     }
 
-    SharesData shares;
+    SharesData public shares;
     bytes32 public uri;
     address public guardian;
     address public oracle;
@@ -56,14 +56,14 @@ contract Campaign {
         address _guardian,
         address _oracle,
         bool _sharesPublished,
-        uint256 _evaluationPeriodDuration
+        uint256 _evaluationPeriodEnd
     ) {
-        evaluationPeriodEnd = block.timestamp + _evaluationPeriodDuration;
         shares = _shares;
         uri = _uri;
         guardian = _guardian;
         oracle = _oracle;
         sharesPublished = _sharesPublished;
+        evaluationPeriodEnd = _evaluationPeriodEnd;
     }
 
     function publishShares(SharesData memory _shares) external onlyOracle {
