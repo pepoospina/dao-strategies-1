@@ -119,7 +119,7 @@ describe('campaign', () => {
         const proofClaimer3 = tree.getProof(claimersBalances[2].account, claimersBalances[2].balance);
         await campaign.claim(claimersBalances[2].account, claimersBalances[2].balance, proofClaimer3);
         const claimer3BalanceAfter = await ethers.provider.getBalance(claimersBalances[2].account);
-        expect(claimer3BalanceAfter.sub(claimer3BalanceBefore)).to.equal(toWei("1").div(2ß));
+        expect(claimer3BalanceAfter.sub(claimer3BalanceBefore)).to.equal(toWei("1").div(2));
 
         //let temp: number = _evaluationPeriodEnd.mul(1000).toNumber();
         //let date: Date = new Date(temp);

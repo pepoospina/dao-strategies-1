@@ -31,6 +31,7 @@ contract Campaign {
     error OnlyGuardian();
     error OnlyDuringEvaluationPeriod();
     error WithdrawalNotAllowed();
+    error ClaimingNotAllowed();
     error WithdrawTransferFailed();
     error NoFunds();
     error SharesAlreadyPublished();
@@ -79,6 +80,9 @@ contract Campaign {
         uint256 share,
         bytes32[] calldata proof
     ) external {
+        if (!claimAllowed()) {
+            revert ClaimingNotAllowed();
+        }
         bytes32 leaf = keccak256(abi.encodePacked(account, share));
         if (MerkleProof.verify(proof, shares.sharesMerkleRoot, leaf) == false) {
             revert InvalidProof();
@@ -128,5 +132,9 @@ contract Campaign {
 
     function withdrawAllowed() private view returns (bool) {
         return campaignCancelled || (block.timestamp > evaluationPeriodEnd && !sharesPublished);
+    }
+
+    function claimAllowed() private view returns (bool) {
+        return block.timestamp > evaluationPeriodEnd && sharesPublished && !campaignCancelled;
     }
 }
