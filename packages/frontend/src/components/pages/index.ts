@@ -4,3 +4,7 @@ import { lazier } from 'eth-hooks/helpers';
 // code is in the component file
 
 export const CampaignCreate = lazier(() => import('./create/CampaignCreate'), 'CampaignCreate');
+
+export const CampaignsList = lazier(() => import('./list/CampaignsList'), 'CampaignsList');
+
+export const CampaignPage = lazier(() => import('./campaign/CampaignPage'), 'CampaignPage');

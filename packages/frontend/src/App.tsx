@@ -1,7 +1,7 @@
 import { EthComponentsSettingsContext, IEthComponentsSettings } from 'eth-components/models';
 import { EthersAppContext } from 'eth-hooks/context';
 import { lazier } from 'eth-hooks/helpers';
-import React, { FC, Suspense } from 'react';
+import { FC, Suspense } from 'react';
 import { ThemeSwitcherProvider } from 'react-css-theme-switcher';
 
 import { ErrorBoundary, ErrorFallback } from '~~/components/common/ErrorFallback';
