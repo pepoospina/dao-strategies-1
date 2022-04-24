@@ -1,117 +1,140 @@
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-import "./openzeppelin/ERC4626NS.sol";
-
-import "hardhat/console.sol";
-
 /**
- * @notice A campaign is deployed together with the merkleRoot of the reward
- * distribution and a hash of the strategy configuration. At any time, reward
- * receivers can claim their rewards, but if they don't wait for the funds to arrive
- * they will receive a lesser portion of the rewards (even none at all).
+ * @title Campaign
  */
-contract Campaign is ERC4626NS {
-    /** storage */
-    bytes32 public strategyHash;
-    bytes32 public merkleRoot;
+contract Campaign {
+    struct SharesData {
+        uint256 totalShares;
+        bytes32 sharesMerkleRoot;
+    }
 
-    mapping(address => bool) rewardsClaimed;
+    SharesData public shares;
+    bytes32 public uri;
+    address public guardian;
+    address public oracle;
+    uint256 public evaluationPeriodEnd;
+    uint256 public totalClaimed;
+    bool public campaignCancelled;
+    bool public sharesPublished;
 
-    /** roles */
-    address public owner;
+    mapping(address => uint256) public claimed;
+    mapping(address => uint256) public funds;
 
-    /** errors */
-    error AlreadyClaimed();
     error InvalidProof();
-    error OnlyOwner();
+    error NoRewardAvailable();
+    error RewardTransferFailed();
+    error OnlyGuardian();
+    error OnlyDuringEvaluationPeriod();
+    error WithdrawalNotAllowed();
+    error ClaimingNotAllowed();
+    error WithdrawTransferFailed();
+    error NoFunds();
+    error SharesAlreadyPublished();
+    error OnlyOracle();
 
-    modifier onlyOwner() {
-        if (msg.sender != owner) {
-            revert OnlyOwner();
+    modifier onlyGuardian() {
+        if (msg.sender != guardian) {
+            revert OnlyGuardian();
+        }
+        _;
+    }
+
+    modifier onlyOracle() {
+        if (msg.sender != oracle) {
+            revert OnlyOracle();
         }
         _;
     }
 
     constructor(
-        address _owner,
-        bytes32 _strategyHash,
-        bytes32 _merkleRoot,
-        uint256 __totalSupply,
-        IERC20 __asset,
-        uint256 _fundTokenDecimals,
-        string memory name,
-        string memory symbol
-    ) ERC4626NS(name, symbol, __asset, _fundTokenDecimals) {
-        owner = _owner;
-
-        strategyHash = _strategyHash;
-        merkleRoot = _merkleRoot;
-        _totalSupply = __totalSupply; // total supply is associated to the merkleRoot
+        SharesData memory _shares,
+        bytes32 _uri,
+        address _guardian,
+        address _oracle,
+        bool _sharesPublished,
+        uint256 _evaluationPeriodEnd
+    ) {
+        shares = _shares;
+        uri = _uri;
+        guardian = _guardian;
+        oracle = _oracle;
+        sharesPublished = _sharesPublished;
+        evaluationPeriodEnd = _evaluationPeriodEnd;
     }
 
-    function checkProof(
-        address to,
-        uint256 amount,
-        bytes32[] calldata proof
-    ) public view {
-        bytes32 leaf = keccak256(abi.encodePacked(to, amount));
-        console.log("---- checkProof ----");
-        console.logBytes32(leaf);
+    function publishShares(SharesData memory _shares) external onlyOracle {
+        if (sharesPublished) {
+            revert SharesAlreadyPublished();
+        }
+        sharesPublished = true;
+        shares = _shares;
+    }
 
-        if (MerkleProof.verify(proof, merkleRoot, leaf) == false) {
-            console.log("leaf invalid");
+    function claim(
+        address account,
+        uint256 share,
+        bytes32[] calldata proof
+    ) external {
+        if (!claimAllowed()) {
+            revert ClaimingNotAllowed();
+        }
+        bytes32 leaf = keccak256(abi.encodePacked(account, share));
+        if (MerkleProof.verify(proof, shares.sharesMerkleRoot, leaf) == false) {
             revert InvalidProof();
         }
 
-        console.log("leaf valid");
+        uint256 totalFundsReceived = address(this).balance + totalClaimed;
+        uint256 reward = (totalFundsReceived * share) / shares.totalShares - claimed[account];
+        if (reward == 0) {
+            revert NoRewardAvailable();
+        }
+        claimed[account] += reward;
+        totalClaimed += reward;
+
+        (bool success, ) = account.call{ value: reward }("");
+        if (!success) {
+            revert RewardTransferFailed();
+        }
     }
 
-    function claimRewardShares(
-        address to,
-        uint256 amount,
-        bytes32[] calldata proof
-    ) public {
-        if (rewardsClaimed[to] == true) {
-            revert AlreadyClaimed();
+    function cancelCampaign() external onlyGuardian {
+        if (block.timestamp > evaluationPeriodEnd) {
+            revert OnlyDuringEvaluationPeriod();
+        }
+        campaignCancelled = true;
+    }
+
+    receive() external payable {
+        funds[msg.sender] += msg.value;
+    }
+
+    function withdrawFunds(address account) external {
+        if (!withdrawAllowed()) {
+            revert WithdrawalNotAllowed();
         }
 
-        rewardsClaimed[to] = true;
-        checkProof(to, amount, proof);
+        uint256 amount = funds[account];
+        if (amount == 0) {
+            revert NoFunds();
+        }
+        funds[account] = 0;
 
-        _reveal(to, amount);
+        (bool success, ) = account.call{ value: amount }("");
+        if (!success) {
+            revert WithdrawTransferFailed();
+        }
     }
 
-    /** claim rewards (can be done by anyone in the name of a reward-claimer) */
-    function claimReward(
-        address account,
-        uint256 amount,
-        bytes32[] calldata proof
-    ) external {
-        console.log(account, amount, msg.sender);
-
-        /** claim shares and redeem in one transaction */
-        claimRewardShares(account, amount, proof);
-
-        console.log("---- claimReward() ---- ", account, amount);
-        console.log("totalSupply()", totalSupply());
-        console.log("totalAssets()", totalAssets());
-        console.log("shares claimed", balanceOf(account));
-
-        redeem(balanceOf(account), account, account);
-
-        console.log("redeem() called");
-
-        console.log("totalSupply()", totalSupply());
-        console.log("totalAssets()", totalAssets());
+    function withdrawAllowed() private view returns (bool) {
+        return campaignCancelled || (block.timestamp > evaluationPeriodEnd && !sharesPublished);
     }
 
-    /** For now the owner can simply withdraw the funds at anytime */
-    function retrieveFunds(uint256 amount) public onlyOwner {
-        _asset.transfer(owner, amount);
+    function claimAllowed() private view returns (bool) {
+        return block.timestamp > evaluationPeriodEnd && sharesPublished && !campaignCancelled;
     }
-
-    // All ERC4626 and ERC20 methods are available on the shares
 }

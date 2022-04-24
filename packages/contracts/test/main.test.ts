@@ -4,104 +4,129 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 
-import { CampaignFactory__factory, Campaign, SampleToken, SampleToken__factory, CampaignFactory, Campaign__factory } from './../typechain';
-import { toWei } from './support';
+import { Campaign, Campaign__factory } from './../typechain';
+import { toWei, getTimestamp, fastForwardFromBlock, fastForwardToTimestamp } from './support';
 
 const LOG = true;
 
 (BigNumber.prototype as any).toJSON = function () {
-  // eslint-disable-next-line
-  return this.toString();
+    // eslint-disable-next-line
+    return this.toString();
 };
 
-// const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 const RANDOM_BYTES32 = '0x5fd924625f6ab16a19cc9807c7c506ae1813490e4ba675f843d5a10e0baacdb8';
+const URI: string = RANDOM_BYTES32;
+const SECONDS_IN_HOUR = 3600;
+const SECONDS_IN_DAY = 86400;
 
 describe('campaign', () => {
-  let campaignContract: Campaign;
 
-  let owner: SignerWithAddress;
-  let claimers: SignerWithAddress[];
-  let claimersBalances: AccountAndBalance[];
-  let tree: BalanceTree;
+    async function setup(sharesDistribution: BigNumber[], publishShares: boolean) {
+        let admin: SignerWithAddress;
+        let guardian: SignerWithAddress;
+        let oracle: SignerWithAddress;
+        let claimers: SignerWithAddress[];
+        let funders: SignerWithAddress[];
+        let tree: BalanceTree;
+        let totalShares: BigNumber;
+        let claimersBalances: AccountAndBalance[];
+        let merkleRoot: string;
 
-  let campaignFactory: CampaignFactory;
-  let daiToken: SampleToken;
+        const addresses = await ethers.getSigners();
+        admin = addresses[0];
+        guardian = addresses[1];
+        oracle = addresses[2];
+        claimers = addresses.slice(4, 4 + sharesDistribution.length);
+        funders = addresses.slice(4 + sharesDistribution.length);
+        totalShares = sharesDistribution.reduce((sum, currentNum) => (sum = sum.add(currentNum)), BigNumber.from(0));
+        claimersBalances = claimers.map((claimer, ix) => {
+            return {
+                account: claimer.address,
+                balance: sharesDistribution[ix],
+            };
+        });
 
-  let totalFunds: BigNumber;
+        tree = new BalanceTree(claimersBalances);
+        merkleRoot = tree.getHexRoot();
 
-  beforeEach(async () => {
-    totalFunds = toWei('100 000');
+        let currentTimestamp = await getTimestamp();
+        let Campaign = await ethers.getContractFactory<Campaign__factory>("Campaign");
+        let campaign = await Campaign.deploy({ totalShares: totalShares, sharesMerkleRoot: merkleRoot }, URI, guardian.address, oracle.address, publishShares, currentTimestamp.add(SECONDS_IN_DAY));
 
-    if (LOG) console.log('deploy a campaign');
-    const addresses = await ethers.getSigners();
+        return {
+            admin,
+            guardian,
+            oracle,
+            funders,
+            tree,
+            merkleRoot,
+            totalShares,
+            claimersBalances,
+            campaign
+        }
+    }
 
-    owner = addresses[0];
-    // funder = addresses[2];
 
-    const campaignFactoryFactory = await ethers.getContractFactory<CampaignFactory__factory>('CampaignFactory');
-    campaignFactory = await campaignFactoryFactory.deploy();
+    it("Should reward claimers according to shares", async () => {
+        const sharesArray = [ethers.BigNumber.from("100"), ethers.BigNumber.from("200"), ethers.BigNumber.from("300")];
 
-    const daiTokenFactory: SampleToken__factory = await ethers.getContractFactory<SampleToken__factory>('SampleToken');
+        const {
+            admin,
+            guardian,
+            oracle,
+            funders,
+            tree,
+            merkleRoot,
+            totalShares,
+            claimersBalances,
+            campaign
+        } = await setup(sharesArray, true);
 
-    daiToken = await daiTokenFactory.deploy(0, 'DAI Test', 'DAI');
-    const decimals = await daiToken.decimals();
+        // sanity checks
+        let shares: Campaign.SharesDataStructOutput = await campaign.shares();
+        expect(shares.sharesMerkleRoot).to.equal(merkleRoot);
+        expect(shares.totalShares).to.equal(totalShares);
+        expect(await campaign.guardian()).to.equal(guardian.address);
+        expect(await campaign.oracle()).to.equal(oracle.address);
+        expect(await campaign.uri()).to.equal(URI);
+        expect(await campaign.sharesPublished()).to.equal(true);
 
-    /** initial balances */
-    await daiToken.connect(owner).mint(toWei('100 000'));
+        // funder sends 1 ether to the campaign 
+        const fundTransaction = await funders[0].sendTransaction({ to: campaign.address, value: toWei("1") });
+        expect(await campaign.funds(funders[0].address)).to.equal(toWei("1"));
+        expect(await ethers.provider.getBalance(campaign.address)).to.equal(toWei("1"));
 
-    const strategyHash: string = RANDOM_BYTES32;
+        // fast forward to claim period
+        let _evaluationPeriodEnd = await campaign.evaluationPeriodEnd();
+        await fastForwardToTimestamp(_evaluationPeriodEnd.add(10));
 
-    claimers = addresses.slice(2, 5);
+        // claimer1 claims, should receive 1/6 ether
+        const claimer1BalanceBefore = await ethers.provider.getBalance(claimersBalances[0].account);
+        const proofClaimer1 = tree.getProof(claimersBalances[0].account, claimersBalances[0].balance);
+        await campaign.claim(claimersBalances[0].account, claimersBalances[0].balance, proofClaimer1);
+        const claimer1BalanceAfter = await ethers.provider.getBalance(claimersBalances[0].account);
+        expect(claimer1BalanceAfter.sub(claimer1BalanceBefore)).to.equal(toWei("1").div(6));
 
-    /**
-     * Account 1 : 1000 shares
-     * Account 2 : 2000 shares
-     * Account 3 : 3000 shares
-     */
-    claimersBalances = claimers.map((claimer, ix) => {
-      return {
-        account: claimer.address,
-        balance: toWei((1000 * (ix + 1)).toString()),
-      };
+        // claimer2 claims, should receive 1/3 ether
+        const claimer2BalanceBefore = await ethers.provider.getBalance(claimersBalances[1].account);
+        const proofClaimer2 = tree.getProof(claimersBalances[1].account, claimersBalances[1].balance);
+        await campaign.claim(claimersBalances[1].account, claimersBalances[1].balance, proofClaimer2);
+        const claimer2BalanceAfter = await ethers.provider.getBalance(claimersBalances[1].account);
+        expect(claimer2BalanceAfter.sub(claimer2BalanceBefore)).to.equal(toWei("1").div(3));
+
+        // claimer3 claims, should receive 1/2 ether
+        const claimer3BalanceBefore = await ethers.provider.getBalance(claimersBalances[2].account);
+        const proofClaimer3 = tree.getProof(claimersBalances[2].account, claimersBalances[2].balance);
+        await campaign.claim(claimersBalances[2].account, claimersBalances[2].balance, proofClaimer3);
+        const claimer3BalanceAfter = await ethers.provider.getBalance(claimersBalances[2].account);
+        expect(claimer3BalanceAfter.sub(claimer3BalanceBefore)).to.equal(toWei("1").div(2));
+
+        //let temp: number = _evaluationPeriodEnd.mul(1000).toNumber();
+        //let date: Date = new Date(temp);
+        //console.log(date.toUTCString());
+
+        //const campaignContractAddress = (tx as any).events[0].args[0] as string;
+        //
+        //campaignContract = (await ethers.getContractFactory<Campaign__factory>('Campaign')).attach(campaignContractAddress);
     });
-
-    tree = new BalanceTree(claimersBalances);
-
-    const merkleRoot = tree.getHexRoot();
-
-    /** give money to funders */
-    const tx = await (
-      await campaignFactory.deploy(owner.address, strategyHash, merkleRoot, tree.totalSupply, daiToken.address, decimals, '', '', RANDOM_BYTES32)
-    ).wait();
-
-    const campaignContractAddress = (tx as any).events[0].args[0] as string;
-
-    campaignContract = (await ethers.getContractFactory<Campaign__factory>('Campaign')).attach(campaignContractAddress);
-
-    /** check */
-    const totalSupplyRead = await campaignContract.totalSupply();
-    expect(totalSupplyRead).to.eq(tree.totalSupply, 'Total supply not as expected');
-
-    /** fund */
-    if (LOG) console.log('fund the campaign');
-    await (await daiToken.connect(owner).transfer(campaignContract.address, totalFunds)).wait();
-  });
-
-  it('merkleRoot should be correct', async () => {
-    for (const claimer of claimersBalances) {
-      const proof = tree.getProof(claimer.account, claimer.balance);
-      await campaignContract.checkProof(claimer.account, claimer.balance, proof);
-    }
-  });
-
-  it('claimers should claim', async () => {
-    for (const claimer of claimersBalances) {
-      const proof = tree.getProof(claimer.account, claimer.balance);
-      const claimerSigner = claimers.find((c) => c.address === claimer.account);
-      if (claimerSigner == undefined) throw new Error('Claimer not found');
-
-      await campaignContract.connect(claimerSigner).claimReward(claimer.account, claimer.balance, proof);
-    }
-  });
 });

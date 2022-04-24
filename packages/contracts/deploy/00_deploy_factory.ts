@@ -6,17 +6,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy('SampleToken', {
+  await deploy('Campaign', {
     from: deployer,
     args: [0, 'DAI Test', 'DAI'],
     log: false,
-  });
-
-  await deploy('CampaignFactory', {
-    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    from: deployer,
-    args: [],
-    log: true,
   });
 };
 

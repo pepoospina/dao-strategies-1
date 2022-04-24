@@ -13,297 +13,118 @@ import {
   Signer,
   utils,
 } from "ethers";
-import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
+import { FunctionFragment, Result } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
+
+export declare namespace Campaign {
+  export type SharesDataStruct = {
+    totalShares: BigNumberish;
+    sharesMerkleRoot: BytesLike;
+  };
+
+  export type SharesDataStructOutput = [BigNumber, string] & {
+    totalShares: BigNumber;
+    sharesMerkleRoot: string;
+  };
+}
 
 export interface CampaignInterface extends utils.Interface {
   contractName: "Campaign";
   functions: {
-    "_convRate()": FunctionFragment;
-    "allowance(address,address)": FunctionFragment;
-    "approve(address,uint256)": FunctionFragment;
-    "asset()": FunctionFragment;
-    "balanceOf(address)": FunctionFragment;
-    "checkProof(address,uint256,bytes32[])": FunctionFragment;
-    "claimReward(address,uint256,bytes32[])": FunctionFragment;
-    "claimRewardShares(address,uint256,bytes32[])": FunctionFragment;
-    "convertToAssets(uint256)": FunctionFragment;
-    "convertToShares(uint256)": FunctionFragment;
-    "decimals()": FunctionFragment;
-    "decreaseAllowance(address,uint256)": FunctionFragment;
-    "deposit(uint256,address)": FunctionFragment;
-    "increaseAllowance(address,uint256)": FunctionFragment;
-    "maxDeposit(address)": FunctionFragment;
-    "maxMint(address)": FunctionFragment;
-    "maxRedeem(address)": FunctionFragment;
-    "maxWithdraw(address)": FunctionFragment;
-    "merkleRoot()": FunctionFragment;
-    "mint(uint256,address)": FunctionFragment;
-    "name()": FunctionFragment;
-    "owner()": FunctionFragment;
-    "previewDeposit(uint256)": FunctionFragment;
-    "previewMint(uint256)": FunctionFragment;
-    "previewRedeem(uint256)": FunctionFragment;
-    "previewWithdraw(uint256)": FunctionFragment;
-    "redeem(uint256,address,address)": FunctionFragment;
-    "retrieveFunds(uint256)": FunctionFragment;
-    "strategyHash()": FunctionFragment;
-    "symbol()": FunctionFragment;
-    "totalAssets()": FunctionFragment;
-    "totalSupply()": FunctionFragment;
-    "transfer(address,uint256)": FunctionFragment;
-    "transferFrom(address,address,uint256)": FunctionFragment;
-    "withdraw(uint256,address,address)": FunctionFragment;
+    "campaignCancelled()": FunctionFragment;
+    "cancelCampaign()": FunctionFragment;
+    "claim(address,uint256,bytes32[])": FunctionFragment;
+    "claimed(address)": FunctionFragment;
+    "evaluationPeriodEnd()": FunctionFragment;
+    "funds(address)": FunctionFragment;
+    "guardian()": FunctionFragment;
+    "oracle()": FunctionFragment;
+    "publishShares((uint256,bytes32))": FunctionFragment;
+    "shares()": FunctionFragment;
+    "sharesPublished()": FunctionFragment;
+    "totalClaimed()": FunctionFragment;
+    "uri()": FunctionFragment;
+    "withdrawFunds(address)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "_convRate", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "allowance",
-    values: [string, string]
+    functionFragment: "campaignCancelled",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "approve",
-    values: [string, BigNumberish]
+    functionFragment: "cancelCampaign",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "asset", values?: undefined): string;
-  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "checkProof",
+    functionFragment: "claim",
     values: [string, BigNumberish, BytesLike[]]
   ): string;
+  encodeFunctionData(functionFragment: "claimed", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "claimReward",
-    values: [string, BigNumberish, BytesLike[]]
+    functionFragment: "evaluationPeriodEnd",
+    values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "funds", values: [string]): string;
+  encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
+  encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "claimRewardShares",
-    values: [string, BigNumberish, BytesLike[]]
+    functionFragment: "publishShares",
+    values: [Campaign.SharesDataStruct]
   ): string;
+  encodeFunctionData(functionFragment: "shares", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "convertToAssets",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "convertToShares",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "decreaseAllowance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "deposit",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseAllowance",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "maxDeposit", values: [string]): string;
-  encodeFunctionData(functionFragment: "maxMint", values: [string]): string;
-  encodeFunctionData(functionFragment: "maxRedeem", values: [string]): string;
-  encodeFunctionData(functionFragment: "maxWithdraw", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "merkleRoot",
+    functionFragment: "sharesPublished",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "mint",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "previewDeposit",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "previewMint",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "previewRedeem",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "previewWithdraw",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "redeem",
-    values: [BigNumberish, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "retrieveFunds",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "strategyHash",
+    functionFragment: "totalClaimed",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: "uri", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalAssets",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalSupply",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transfer",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferFrom",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdraw",
-    values: [BigNumberish, string, string]
+    functionFragment: "withdrawFunds",
+    values: [string]
   ): string;
 
-  decodeFunctionResult(functionFragment: "_convRate", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "asset", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "checkProof", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "claimReward",
+    functionFragment: "campaignCancelled",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "claimRewardShares",
+    functionFragment: "cancelCampaign",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "claimed", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "evaluationPeriodEnd",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "funds", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "publishShares",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "sharesPublished",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "convertToAssets",
+    functionFragment: "totalClaimed",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "convertToShares",
+    functionFragment: "withdrawFunds",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "decreaseAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseAllowance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "maxDeposit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "maxMint", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "maxRedeem", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "maxWithdraw",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "merkleRoot", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "previewDeposit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "previewMint",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "previewRedeem",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "previewWithdraw",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "retrieveFunds",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "strategyHash",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "totalAssets",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "totalSupply",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "transfer", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
-  events: {
-    "Approval(address,address,uint256)": EventFragment;
-    "Deposit(address,address,uint256,uint256)": EventFragment;
-    "Reveal(address,uint256)": EventFragment;
-    "TransferNS(address,address,uint256)": EventFragment;
-    "Withdraw(address,address,address,uint256,uint256)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Reveal"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TransferNS"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
+  events: {};
 }
-
-export type ApprovalEvent = TypedEvent<
-  [string, string, BigNumber],
-  { owner: string; spender: string; value: BigNumber }
->;
-
-export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
-
-export type DepositEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber],
-  { caller: string; owner: string; assets: BigNumber; shares: BigNumber }
->;
-
-export type DepositEventFilter = TypedEventFilter<DepositEvent>;
-
-export type RevealEvent = TypedEvent<
-  [string, BigNumber],
-  { to: string; value: BigNumber }
->;
-
-export type RevealEventFilter = TypedEventFilter<RevealEvent>;
-
-export type TransferNSEvent = TypedEvent<
-  [string, string, BigNumber],
-  { from: string; to: string; value: BigNumber }
->;
-
-export type TransferNSEventFilter = TypedEventFilter<TransferNSEvent>;
-
-export type WithdrawEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber],
-  {
-    caller: string;
-    receiver: string;
-    owner: string;
-    assets: BigNumber;
-    shares: BigNumber;
-  }
->;
-
-export type WithdrawEventFilter = TypedEventFilter<WithdrawEvent>;
 
 export interface Campaign extends BaseContract {
   contractName: "Campaign";
@@ -333,827 +154,231 @@ export interface Campaign extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    _convRate(overrides?: CallOverrides): Promise<[BigNumber]>;
+    campaignCancelled(overrides?: CallOverrides): Promise<[boolean]>;
 
-    allowance(
-      owner: string,
-      spender: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    approve(
-      spender: string,
-      amount: BigNumberish,
+    cancelCampaign(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    asset(overrides?: CallOverrides): Promise<[string]>;
-
-    balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    checkProof(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<[void]>;
-
-    claimReward(
+    claim(
       account: string,
-      amount: BigNumberish,
+      share: BigNumberish,
       proof: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    claimRewardShares(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
+    claimed(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    evaluationPeriodEnd(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    funds(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    guardian(overrides?: CallOverrides): Promise<[string]>;
+
+    oracle(overrides?: CallOverrides): Promise<[string]>;
+
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    convertToAssets(
-      shares: BigNumberish,
+    shares(
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { assets: BigNumber }>;
+    ): Promise<
+      [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+    >;
 
-    convertToShares(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { shares: BigNumber }>;
+    sharesPublished(overrides?: CallOverrides): Promise<[boolean]>;
 
-    decimals(overrides?: CallOverrides): Promise<[number]>;
+    totalClaimed(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    uri(overrides?: CallOverrides): Promise<[string]>;
 
-    deposit(
-      assets: BigNumberish,
-      receiver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    maxDeposit(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxMint(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxRedeem(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxWithdraw(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    merkleRoot(overrides?: CallOverrides): Promise<[string]>;
-
-    mint(
-      shares: BigNumberish,
-      receiver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    name(overrides?: CallOverrides): Promise<[string]>;
-
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    previewDeposit(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    previewMint(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    previewRedeem(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    previewWithdraw(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    redeem(
-      shares: BigNumberish,
-      receiver: string,
-      owner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    retrieveFunds(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    strategyHash(overrides?: CallOverrides): Promise<[string]>;
-
-    symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    totalAssets(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    transfer(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    transferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdraw(
-      assets: BigNumberish,
-      receiver: string,
-      owner: string,
+    withdrawFunds(
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  _convRate(overrides?: CallOverrides): Promise<BigNumber>;
+  campaignCancelled(overrides?: CallOverrides): Promise<boolean>;
 
-  allowance(
-    owner: string,
-    spender: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  approve(
-    spender: string,
-    amount: BigNumberish,
+  cancelCampaign(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  asset(overrides?: CallOverrides): Promise<string>;
-
-  balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  checkProof(
-    to: string,
-    amount: BigNumberish,
-    proof: BytesLike[],
-    overrides?: CallOverrides
-  ): Promise<void>;
-
-  claimReward(
+  claim(
     account: string,
-    amount: BigNumberish,
+    share: BigNumberish,
     proof: BytesLike[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  claimRewardShares(
-    to: string,
-    amount: BigNumberish,
-    proof: BytesLike[],
+  claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+
+  funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  guardian(overrides?: CallOverrides): Promise<string>;
+
+  oracle(overrides?: CallOverrides): Promise<string>;
+
+  publishShares(
+    _shares: Campaign.SharesDataStruct,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  convertToAssets(
-    shares: BigNumberish,
+  shares(
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<
+    [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+  >;
 
-  convertToShares(
-    assets: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
-  decimals(overrides?: CallOverrides): Promise<number>;
+  totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-  decreaseAllowance(
-    spender: string,
-    subtractedValue: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  uri(overrides?: CallOverrides): Promise<string>;
 
-  deposit(
-    assets: BigNumberish,
-    receiver: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  increaseAllowance(
-    spender: string,
-    addedValue: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  maxDeposit(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxMint(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxRedeem(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxWithdraw(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  merkleRoot(overrides?: CallOverrides): Promise<string>;
-
-  mint(
-    shares: BigNumberish,
-    receiver: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  name(overrides?: CallOverrides): Promise<string>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  previewDeposit(
-    assets: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  previewMint(
-    shares: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  previewRedeem(
-    shares: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  previewWithdraw(
-    assets: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  redeem(
-    shares: BigNumberish,
-    receiver: string,
-    owner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  retrieveFunds(
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  strategyHash(overrides?: CallOverrides): Promise<string>;
-
-  symbol(overrides?: CallOverrides): Promise<string>;
-
-  totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
-
-  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  transfer(
-    to: string,
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  transferFrom(
-    from: string,
-    to: string,
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdraw(
-    assets: BigNumberish,
-    receiver: string,
-    owner: string,
+  withdrawFunds(
+    account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    _convRate(overrides?: CallOverrides): Promise<BigNumber>;
+    campaignCancelled(overrides?: CallOverrides): Promise<boolean>;
 
-    allowance(
-      owner: string,
-      spender: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    cancelCampaign(overrides?: CallOverrides): Promise<void>;
 
-    approve(
-      spender: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    asset(overrides?: CallOverrides): Promise<string>;
-
-    balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    checkProof(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    claimReward(
+    claim(
       account: string,
-      amount: BigNumberish,
+      share: BigNumberish,
       proof: BytesLike[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claimRewardShares(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
+    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+
+    funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    guardian(overrides?: CallOverrides): Promise<string>;
+
+    oracle(overrides?: CallOverrides): Promise<string>;
+
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    convertToAssets(
-      shares: BigNumberish,
+    shares(
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<
+      [BigNumber, string] & { totalShares: BigNumber; sharesMerkleRoot: string }
+    >;
 
-    convertToShares(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    sharesPublished(overrides?: CallOverrides): Promise<boolean>;
 
-    decimals(overrides?: CallOverrides): Promise<number>;
+    totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-    decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    uri(overrides?: CallOverrides): Promise<string>;
 
-    deposit(
-      assets: BigNumberish,
-      receiver: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    maxDeposit(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxMint(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxRedeem(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxWithdraw(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    merkleRoot(overrides?: CallOverrides): Promise<string>;
-
-    mint(
-      shares: BigNumberish,
-      receiver: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    name(overrides?: CallOverrides): Promise<string>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    previewDeposit(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewMint(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewRedeem(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewWithdraw(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    redeem(
-      shares: BigNumberish,
-      receiver: string,
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    retrieveFunds(
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    strategyHash(overrides?: CallOverrides): Promise<string>;
-
-    symbol(overrides?: CallOverrides): Promise<string>;
-
-    totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
-
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transfer(
-      to: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    transferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    withdraw(
-      assets: BigNumberish,
-      receiver: string,
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    withdrawFunds(account: string, overrides?: CallOverrides): Promise<void>;
   };
 
-  filters: {
-    "Approval(address,address,uint256)"(
-      owner?: string | null,
-      spender?: string | null,
-      value?: null
-    ): ApprovalEventFilter;
-    Approval(
-      owner?: string | null,
-      spender?: string | null,
-      value?: null
-    ): ApprovalEventFilter;
-
-    "Deposit(address,address,uint256,uint256)"(
-      caller?: string | null,
-      owner?: string | null,
-      assets?: null,
-      shares?: null
-    ): DepositEventFilter;
-    Deposit(
-      caller?: string | null,
-      owner?: string | null,
-      assets?: null,
-      shares?: null
-    ): DepositEventFilter;
-
-    "Reveal(address,uint256)"(
-      to?: string | null,
-      value?: null
-    ): RevealEventFilter;
-    Reveal(to?: string | null, value?: null): RevealEventFilter;
-
-    "TransferNS(address,address,uint256)"(
-      from?: string | null,
-      to?: string | null,
-      value?: null
-    ): TransferNSEventFilter;
-    TransferNS(
-      from?: string | null,
-      to?: string | null,
-      value?: null
-    ): TransferNSEventFilter;
-
-    "Withdraw(address,address,address,uint256,uint256)"(
-      caller?: string | null,
-      receiver?: string | null,
-      owner?: string | null,
-      assets?: null,
-      shares?: null
-    ): WithdrawEventFilter;
-    Withdraw(
-      caller?: string | null,
-      receiver?: string | null,
-      owner?: string | null,
-      assets?: null,
-      shares?: null
-    ): WithdrawEventFilter;
-  };
+  filters: {};
 
   estimateGas: {
-    _convRate(overrides?: CallOverrides): Promise<BigNumber>;
+    campaignCancelled(overrides?: CallOverrides): Promise<BigNumber>;
 
-    allowance(
-      owner: string,
-      spender: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    approve(
-      spender: string,
-      amount: BigNumberish,
+    cancelCampaign(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    asset(overrides?: CallOverrides): Promise<BigNumber>;
-
-    balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    checkProof(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    claimReward(
+    claim(
       account: string,
-      amount: BigNumberish,
+      share: BigNumberish,
       proof: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    claimRewardShares(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
+    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+
+    funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    guardian(overrides?: CallOverrides): Promise<BigNumber>;
+
+    oracle(overrides?: CallOverrides): Promise<BigNumber>;
+
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    convertToAssets(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    shares(overrides?: CallOverrides): Promise<BigNumber>;
 
-    convertToShares(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    sharesPublished(overrides?: CallOverrides): Promise<BigNumber>;
 
-    decimals(overrides?: CallOverrides): Promise<BigNumber>;
+    totalClaimed(overrides?: CallOverrides): Promise<BigNumber>;
 
-    decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    uri(overrides?: CallOverrides): Promise<BigNumber>;
 
-    deposit(
-      assets: BigNumberish,
-      receiver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    maxDeposit(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxMint(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxRedeem(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxWithdraw(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    merkleRoot(overrides?: CallOverrides): Promise<BigNumber>;
-
-    mint(
-      shares: BigNumberish,
-      receiver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    name(overrides?: CallOverrides): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    previewDeposit(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewMint(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewRedeem(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    previewWithdraw(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    redeem(
-      shares: BigNumberish,
-      receiver: string,
-      owner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    retrieveFunds(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    strategyHash(overrides?: CallOverrides): Promise<BigNumber>;
-
-    symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    totalAssets(overrides?: CallOverrides): Promise<BigNumber>;
-
-    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    transfer(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    transferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdraw(
-      assets: BigNumberish,
-      receiver: string,
-      owner: string,
+    withdrawFunds(
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    _convRate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    campaignCancelled(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    allowance(
-      owner: string,
-      spender: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    approve(
-      spender: string,
-      amount: BigNumberish,
+    cancelCampaign(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    asset(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    balanceOf(
+    claim(
       account: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    checkProof(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    claimReward(
-      account: string,
-      amount: BigNumberish,
+      share: BigNumberish,
       proof: BytesLike[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    claimRewardShares(
-      to: string,
-      amount: BigNumberish,
-      proof: BytesLike[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    convertToAssets(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    convertToShares(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    decimals(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    decreaseAllowance(
-      spender: string,
-      subtractedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    deposit(
-      assets: BigNumberish,
-      receiver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    increaseAllowance(
-      spender: string,
-      addedValue: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    maxDeposit(
+    claimed(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    maxMint(
+    evaluationPeriodEnd(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    funds(
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    maxRedeem(
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    maxWithdraw(
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    merkleRoot(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    mint(
-      shares: BigNumberish,
-      receiver: string,
+    publishShares(
+      _shares: Campaign.SharesDataStruct,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    shares(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    sharesPublished(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    previewDeposit(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    totalClaimed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    previewMint(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    uri(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    previewRedeem(
-      shares: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    previewWithdraw(
-      assets: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    redeem(
-      shares: BigNumberish,
-      receiver: string,
-      owner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    retrieveFunds(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    strategyHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    totalAssets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    transfer(
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    transferFrom(
-      from: string,
-      to: string,
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdraw(
-      assets: BigNumberish,
-      receiver: string,
-      owner: string,
+    withdrawFunds(
+      account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
