@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 
-import { Campaign, Campaign__factory } from './../typechain';
+import { Campaign, Campaign__factory, CampaignFactory, CampaignFactory__factory } from './../typechain';
 import { toWei, getTimestamp, fastForwardFromBlock, fastForwardToTimestamp } from './support';
 
 const LOG = true;
@@ -50,8 +50,15 @@ describe('campaign', () => {
         merkleRoot = tree.getHexRoot();
 
         let currentTimestamp = await getTimestamp();
-        let Campaign = await ethers.getContractFactory<Campaign__factory>("Campaign");
-        let campaign = await Campaign.deploy({ totalShares: totalShares, sharesMerkleRoot: merkleRoot }, URI, guardian.address, oracle.address, publishShares, currentTimestamp.add(SECONDS_IN_DAY));
+        let campaignFactoryDeployer = await ethers.getContractFactory<CampaignFactory__factory>("CampaignFactory");
+        let campaignDeployer = await ethers.getContractFactory<Campaign__factory>("Campaign");
+
+        let campaignMaster: Campaign = await campaignDeployer.deploy(); // deploy cmapign master implementation
+        let campaignFactory: CampaignFactory = await campaignFactoryDeployer.deploy(campaignMaster.address);
+        let campaignCreationTx = await campaignFactory.createCampaign({ totalShares: totalShares, sharesMerkleRoot: merkleRoot }, URI, guardian.address, oracle.address, publishShares, currentTimestamp.add(SECONDS_IN_DAY));
+        let campaignCreationReceipt = await campaignCreationTx.wait()
+        let campaignAddress: string = ((campaignCreationReceipt as any).events[0].args[1]); // get campaign proxy address from the CampaignCreated event
+        let campaign = campaignDeployer.attach(campaignAddress);
 
         return {
             admin,
@@ -97,8 +104,8 @@ describe('campaign', () => {
         expect(await ethers.provider.getBalance(campaign.address)).to.equal(toWei("1"));
 
         // fast forward to claim period
-        let _evaluationPeriodEnd = await campaign.evaluationPeriodEnd();
-        await fastForwardToTimestamp(_evaluationPeriodEnd.add(10));
+        let _claimPeriodStart = await campaign.claimPeriodStart();
+        await fastForwardToTimestamp(_claimPeriodStart.add(10));
 
         // claimer1 claims, should receive 1/6 ether
         const claimer1BalanceBefore = await ethers.provider.getBalance(claimersBalances[0].account);
@@ -120,13 +127,5 @@ describe('campaign', () => {
         await campaign.claim(claimersBalances[2].account, claimersBalances[2].balance, proofClaimer3);
         const claimer3BalanceAfter = await ethers.provider.getBalance(claimersBalances[2].account);
         expect(claimer3BalanceAfter.sub(claimer3BalanceBefore)).to.equal(toWei("1").div(2));
-
-        //let temp: number = _evaluationPeriodEnd.mul(1000).toNumber();
-        //let date: Date = new Date(temp);
-        //console.log(date.toUTCString());
-
-        //const campaignContractAddress = (tx as any).events[0].args[0] as string;
-        //
-        //campaignContract = (await ethers.getContractFactory<Campaign__factory>('Campaign')).attach(campaignContractAddress);
     });
 });

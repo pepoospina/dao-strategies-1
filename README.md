@@ -29,12 +29,6 @@ yarn chain
 Open another terminal and run
 
 ```
-yarn deploy
-```
-
-Then you can test with
-
-```
 yarn test
 ```
 
