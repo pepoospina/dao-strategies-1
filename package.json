@@ -60,6 +60,7 @@
       "packages/frontend",
       "packages/services",
       "packages/subgraph",
+      "packages/oracle-node",
       "packages/test-core-import"
     ]
   },
