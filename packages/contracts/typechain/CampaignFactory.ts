@@ -54,15 +54,37 @@ export interface CampaignFactoryInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "CampaignCreated(address,address)": EventFragment;
+    "CampaignCreated(address,address,bytes32,uint256,bytes32,address,address,bool,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CampaignCreated"): EventFragment;
 }
 
 export type CampaignCreatedEvent = TypedEvent<
-  [string, string],
-  { creator: string; newCampaign: string }
+  [
+    string,
+    string,
+    string,
+    BigNumber,
+    string,
+    string,
+    string,
+    boolean,
+    BigNumber,
+    string
+  ],
+  {
+    creator: string;
+    newCampaign: string;
+    _sharesRoot: string;
+    _sharesTotal: BigNumber;
+    _uri: string;
+    _guardian: string;
+    _oracle: string;
+    _sharesPublished: boolean;
+    _claimPeriodStart: BigNumber;
+    salt: string;
+  }
 >;
 
 export type CampaignCreatedEventFilter = TypedEventFilter<CampaignCreatedEvent>;
@@ -132,13 +154,29 @@ export interface CampaignFactory extends BaseContract {
   };
 
   filters: {
-    "CampaignCreated(address,address)"(
+    "CampaignCreated(address,address,bytes32,uint256,bytes32,address,address,bool,uint256,bytes32)"(
       creator?: null,
-      newCampaign?: null
+      newCampaign?: null,
+      _sharesRoot?: null,
+      _sharesTotal?: null,
+      _uri?: null,
+      _guardian?: null,
+      _oracle?: null,
+      _sharesPublished?: null,
+      _claimPeriodStart?: null,
+      salt?: null
     ): CampaignCreatedEventFilter;
     CampaignCreated(
       creator?: null,
-      newCampaign?: null
+      newCampaign?: null,
+      _sharesRoot?: null,
+      _sharesTotal?: null,
+      _uri?: null,
+      _guardian?: null,
+      _oracle?: null,
+      _sharesPublished?: null,
+      _claimPeriodStart?: null,
+      salt?: null
     ): CampaignCreatedEventFilter;
   };
 

@@ -43,8 +43,8 @@ export class Campaign extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get owner(): Bytes | null {
-    let value = this.get("owner");
+  get creator(): Bytes | null {
+    let value = this.get("creator");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -52,16 +52,16 @@ export class Campaign extends Entity {
     }
   }
 
-  set owner(value: Bytes | null) {
+  set creator(value: Bytes | null) {
     if (!value) {
-      this.unset("owner");
+      this.unset("creator");
     } else {
-      this.set("owner", Value.fromBytes(<Bytes>value));
+      this.set("creator", Value.fromBytes(<Bytes>value));
     }
   }
 
-  get strategyHash(): Bytes | null {
-    let value = this.get("strategyHash");
+  get address(): Bytes | null {
+    let value = this.get("address");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -69,16 +69,16 @@ export class Campaign extends Entity {
     }
   }
 
-  set strategyHash(value: Bytes | null) {
+  set address(value: Bytes | null) {
     if (!value) {
-      this.unset("strategyHash");
+      this.unset("address");
     } else {
-      this.set("strategyHash", Value.fromBytes(<Bytes>value));
+      this.set("address", Value.fromBytes(<Bytes>value));
     }
   }
 
-  get merkleRoot(): Bytes | null {
-    let value = this.get("merkleRoot");
+  get sharesRoot(): Bytes | null {
+    let value = this.get("sharesRoot");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -86,16 +86,16 @@ export class Campaign extends Entity {
     }
   }
 
-  set merkleRoot(value: Bytes | null) {
+  set sharesRoot(value: Bytes | null) {
     if (!value) {
-      this.unset("merkleRoot");
+      this.unset("sharesRoot");
     } else {
-      this.set("merkleRoot", Value.fromBytes(<Bytes>value));
+      this.set("sharesRoot", Value.fromBytes(<Bytes>value));
     }
   }
 
-  get totalSupply(): BigInt | null {
-    let value = this.get("totalSupply");
+  get sharesTotal(): BigInt | null {
+    let value = this.get("sharesTotal");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -103,16 +103,16 @@ export class Campaign extends Entity {
     }
   }
 
-  set totalSupply(value: BigInt | null) {
+  set sharesTotal(value: BigInt | null) {
     if (!value) {
-      this.unset("totalSupply");
+      this.unset("sharesTotal");
     } else {
-      this.set("totalSupply", Value.fromBigInt(<BigInt>value));
+      this.set("sharesTotal", Value.fromBigInt(<BigInt>value));
     }
   }
 
-  get assetAddress(): Bytes | null {
-    let value = this.get("assetAddress");
+  get uri(): Bytes | null {
+    let value = this.get("uri");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -120,11 +120,71 @@ export class Campaign extends Entity {
     }
   }
 
-  set assetAddress(value: Bytes | null) {
+  set uri(value: Bytes | null) {
     if (!value) {
-      this.unset("assetAddress");
+      this.unset("uri");
     } else {
-      this.set("assetAddress", Value.fromBytes(<Bytes>value));
+      this.set("uri", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get guardian(): Bytes | null {
+    let value = this.get("guardian");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set guardian(value: Bytes | null) {
+    if (!value) {
+      this.unset("guardian");
+    } else {
+      this.set("guardian", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get oracle(): Bytes | null {
+    let value = this.get("oracle");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set oracle(value: Bytes | null) {
+    if (!value) {
+      this.unset("oracle");
+    } else {
+      this.set("oracle", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get sharesPublished(): boolean {
+    let value = this.get("sharesPublished");
+    return value!.toBoolean();
+  }
+
+  set sharesPublished(value: boolean) {
+    this.set("sharesPublished", Value.fromBoolean(value));
+  }
+
+  get claimPeriodStart(): BigInt | null {
+    let value = this.get("claimPeriodStart");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set claimPeriodStart(value: BigInt | null) {
+    if (!value) {
+      this.unset("claimPeriodStart");
+    } else {
+      this.set("claimPeriodStart", Value.fromBigInt(<BigInt>value));
     }
   }
 }

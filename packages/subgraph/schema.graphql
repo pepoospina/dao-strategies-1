@@ -1,8 +1,12 @@
 type Campaign @entity {
   id: ID!
-  owner: Bytes
-  strategyHash: Bytes
-  merkleRoot: Bytes
-  totalSupply: BigInt
-  assetAddress: Bytes
+  creator: Bytes
+  address: Bytes
+  sharesRoot: Bytes
+  sharesTotal: BigInt
+  uri: Bytes
+  guardian: Bytes
+  oracle: Bytes
+  sharesPublished: Boolean
+  claimPeriodStart: BigInt
 }

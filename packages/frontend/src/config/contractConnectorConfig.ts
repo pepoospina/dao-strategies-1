@@ -3,7 +3,7 @@ import { createConnectorForHardhatContract } from 'eth-hooks/context';
 
 import hardhatContractsJson from '../generated/hardhat_contracts.json';
 
-import { CampaignFactory__factory, SampleToken__factory } from '~~/generated/typechain';
+import { CampaignFactory__factory } from '~~/generated/typechain';
 
 export const contractConnectorConfig = () => {
   try {
@@ -14,8 +14,6 @@ export const contractConnectorConfig = () => {
         CampaignFactory__factory,
         hardhatContractsJson
       ),
-
-      SampleToken: createConnectorForHardhatContract('SampleToken', SampleToken__factory, hardhatContractsJson),
     } as const;
 
     return result;
