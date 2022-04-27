@@ -32,7 +32,7 @@ export declare namespace Campaign {
 export interface CampaignFactoryInterface extends utils.Interface {
   contractName: "CampaignFactory";
   functions: {
-    "createCampaign((uint256,bytes32),bytes32,address,address,bool,uint256)": FunctionFragment;
+    "createCampaign((uint256,bytes32),bytes32,address,address,bool,uint256,bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -43,7 +43,8 @@ export interface CampaignFactoryInterface extends utils.Interface {
       string,
       string,
       boolean,
-      BigNumberish
+      BigNumberish,
+      BytesLike
     ]
   ): string;
 
@@ -101,6 +102,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -112,6 +114,7 @@ export interface CampaignFactory extends BaseContract {
     _oracle: string,
     _sharesPublished: boolean,
     _claimPeriodStart: BigNumberish,
+    salt: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -123,6 +126,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -146,6 +150,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -158,6 +163,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -63,7 +63,8 @@ describe('campaign', () => {
       guardian.address,
       oracle.address,
       publishShares,
-      currentTimestamp.add(SECONDS_IN_DAY)
+      currentTimestamp.add(SECONDS_IN_DAY),
+      ethers.utils.keccak256(ethers.utils.toUtf8Bytes('1'))
     );
     const campaignCreationReceipt = await campaignCreationTx.wait();
     const campaignAddress: string = (campaignCreationReceipt as any).events[0].args[1]; // get campaign proxy address from the CampaignCreated event
