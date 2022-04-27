@@ -35,10 +35,11 @@ export interface CampaignInterface extends utils.Interface {
     "campaignCancelled()": FunctionFragment;
     "cancelCampaign()": FunctionFragment;
     "claim(address,uint256,bytes32[])": FunctionFragment;
+    "claimPeriodStart()": FunctionFragment;
     "claimed(address)": FunctionFragment;
-    "evaluationPeriodEnd()": FunctionFragment;
     "funds(address)": FunctionFragment;
     "guardian()": FunctionFragment;
+    "initCampaign((uint256,bytes32),bytes32,address,address,bool,uint256)": FunctionFragment;
     "oracle()": FunctionFragment;
     "publishShares((uint256,bytes32))": FunctionFragment;
     "shares()": FunctionFragment;
@@ -60,13 +61,24 @@ export interface CampaignInterface extends utils.Interface {
     functionFragment: "claim",
     values: [string, BigNumberish, BytesLike[]]
   ): string;
-  encodeFunctionData(functionFragment: "claimed", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "evaluationPeriodEnd",
+    functionFragment: "claimPeriodStart",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "claimed", values: [string]): string;
   encodeFunctionData(functionFragment: "funds", values: [string]): string;
   encodeFunctionData(functionFragment: "guardian", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "initCampaign",
+    values: [
+      Campaign.SharesDataStruct,
+      BytesLike,
+      string,
+      string,
+      boolean,
+      BigNumberish
+    ]
+  ): string;
   encodeFunctionData(functionFragment: "oracle", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "publishShares",
@@ -96,13 +108,17 @@ export interface CampaignInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "claimed", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "evaluationPeriodEnd",
+    functionFragment: "claimPeriodStart",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "claimed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "funds", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "guardian", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "initCampaign",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "oracle", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "publishShares",
@@ -167,13 +183,23 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    claimed(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    claimPeriodStart(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    evaluationPeriodEnd(overrides?: CallOverrides): Promise<[BigNumber]>;
+    claimed(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     funds(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     guardian(overrides?: CallOverrides): Promise<[string]>;
+
+    initCampaign(
+      _shares: Campaign.SharesDataStruct,
+      _uri: BytesLike,
+      _guardian: string,
+      _oracle: string,
+      _sharesPublished: boolean,
+      _claimPeriodStart: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     oracle(overrides?: CallOverrides): Promise<[string]>;
 
@@ -213,13 +239,23 @@ export interface Campaign extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+  claimPeriodStart(overrides?: CallOverrides): Promise<BigNumber>;
 
-  evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+  claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   guardian(overrides?: CallOverrides): Promise<string>;
+
+  initCampaign(
+    _shares: Campaign.SharesDataStruct,
+    _uri: BytesLike,
+    _guardian: string,
+    _oracle: string,
+    _sharesPublished: boolean,
+    _claimPeriodStart: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   oracle(overrides?: CallOverrides): Promise<string>;
 
@@ -257,13 +293,23 @@ export interface Campaign extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    claimPeriodStart(overrides?: CallOverrides): Promise<BigNumber>;
 
-    evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     guardian(overrides?: CallOverrides): Promise<string>;
+
+    initCampaign(
+      _shares: Campaign.SharesDataStruct,
+      _uri: BytesLike,
+      _guardian: string,
+      _oracle: string,
+      _sharesPublished: boolean,
+      _claimPeriodStart: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     oracle(overrides?: CallOverrides): Promise<string>;
 
@@ -303,13 +349,23 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+    claimPeriodStart(overrides?: CallOverrides): Promise<BigNumber>;
 
-    evaluationPeriodEnd(overrides?: CallOverrides): Promise<BigNumber>;
+    claimed(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     funds(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     guardian(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initCampaign(
+      _shares: Campaign.SharesDataStruct,
+      _uri: BytesLike,
+      _guardian: string,
+      _oracle: string,
+      _sharesPublished: boolean,
+      _claimPeriodStart: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     oracle(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -346,12 +402,10 @@ export interface Campaign extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    claimPeriodStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     claimed(
       arg0: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    evaluationPeriodEnd(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -361,6 +415,16 @@ export interface Campaign extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     guardian(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    initCampaign(
+      _shares: Campaign.SharesDataStruct,
+      _uri: BytesLike,
+      _guardian: string,
+      _oracle: string,
+      _sharesPublished: boolean,
+      _claimPeriodStart: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     oracle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

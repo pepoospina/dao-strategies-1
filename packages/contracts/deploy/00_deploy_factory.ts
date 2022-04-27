@@ -6,11 +6,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy('Campaign', {
-    from: deployer,
-    args: [0, 'DAI Test', 'DAI'],
-    log: false,
-  });
 };
 
 export default func;

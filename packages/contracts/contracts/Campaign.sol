@@ -3,11 +3,12 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
 /**
  * @title Campaign
  */
-contract Campaign {
+contract Campaign is Initializable {
     struct SharesData {
         uint256 totalShares;
         bytes32 sharesMerkleRoot;
@@ -17,7 +18,7 @@ contract Campaign {
     bytes32 public uri;
     address public guardian;
     address public oracle;
-    uint256 public evaluationPeriodEnd;
+    uint256 public claimPeriodStart;
     uint256 public totalClaimed;
     bool public campaignCancelled;
     bool public sharesPublished;
@@ -51,20 +52,20 @@ contract Campaign {
         _;
     }
 
-    constructor(
+    function initCampaign(
         SharesData memory _shares,
         bytes32 _uri,
         address _guardian,
         address _oracle,
         bool _sharesPublished,
-        uint256 _evaluationPeriodEnd
-    ) {
+        uint256 _claimPeriodStart
+    ) public initializer {
         shares = _shares;
         uri = _uri;
         guardian = _guardian;
         oracle = _oracle;
         sharesPublished = _sharesPublished;
-        evaluationPeriodEnd = _evaluationPeriodEnd;
+        claimPeriodStart = _claimPeriodStart;
     }
 
     function publishShares(SharesData memory _shares) external onlyOracle {
@@ -103,7 +104,7 @@ contract Campaign {
     }
 
     function cancelCampaign() external onlyGuardian {
-        if (block.timestamp > evaluationPeriodEnd) {
+        if (block.timestamp > claimPeriodStart) {
             revert OnlyDuringEvaluationPeriod();
         }
         campaignCancelled = true;
@@ -131,10 +132,10 @@ contract Campaign {
     }
 
     function withdrawAllowed() private view returns (bool) {
-        return campaignCancelled || (block.timestamp > evaluationPeriodEnd && !sharesPublished);
+        return campaignCancelled || (block.timestamp > claimPeriodStart && !sharesPublished);
     }
 
     function claimAllowed() private view returns (bool) {
-        return block.timestamp > evaluationPeriodEnd && sharesPublished && !campaignCancelled;
+        return block.timestamp > claimPeriodStart && sharesPublished && !campaignCancelled;
     }
 }
