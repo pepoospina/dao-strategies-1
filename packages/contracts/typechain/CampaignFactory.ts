@@ -32,7 +32,7 @@ export declare namespace Campaign {
 export interface CampaignFactoryInterface extends utils.Interface {
   contractName: "CampaignFactory";
   functions: {
-    "createCampaign((uint256,bytes32),bytes32,address,address,bool,uint256)": FunctionFragment;
+    "createCampaign((uint256,bytes32),bytes32,address,address,bool,uint256,bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -43,7 +43,8 @@ export interface CampaignFactoryInterface extends utils.Interface {
       string,
       string,
       boolean,
-      BigNumberish
+      BigNumberish,
+      BytesLike
     ]
   ): string;
 
@@ -53,15 +54,37 @@ export interface CampaignFactoryInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "CampaignCreated(address,address)": EventFragment;
+    "CampaignCreated(address,address,bytes32,uint256,bytes32,address,address,bool,uint256,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "CampaignCreated"): EventFragment;
 }
 
 export type CampaignCreatedEvent = TypedEvent<
-  [string, string],
-  { creator: string; newCampaign: string }
+  [
+    string,
+    string,
+    string,
+    BigNumber,
+    string,
+    string,
+    string,
+    boolean,
+    BigNumber,
+    string
+  ],
+  {
+    creator: string;
+    newCampaign: string;
+    _sharesRoot: string;
+    _sharesTotal: BigNumber;
+    _uri: string;
+    _guardian: string;
+    _oracle: string;
+    _sharesPublished: boolean;
+    _claimPeriodStart: BigNumber;
+    salt: string;
+  }
 >;
 
 export type CampaignCreatedEventFilter = TypedEventFilter<CampaignCreatedEvent>;
@@ -101,6 +124,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -112,6 +136,7 @@ export interface CampaignFactory extends BaseContract {
     _oracle: string,
     _sharesPublished: boolean,
     _claimPeriodStart: BigNumberish,
+    salt: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -123,18 +148,35 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
-    "CampaignCreated(address,address)"(
+    "CampaignCreated(address,address,bytes32,uint256,bytes32,address,address,bool,uint256,bytes32)"(
       creator?: null,
-      newCampaign?: null
+      newCampaign?: null,
+      _sharesRoot?: null,
+      _sharesTotal?: null,
+      _uri?: null,
+      _guardian?: null,
+      _oracle?: null,
+      _sharesPublished?: null,
+      _claimPeriodStart?: null,
+      salt?: null
     ): CampaignCreatedEventFilter;
     CampaignCreated(
       creator?: null,
-      newCampaign?: null
+      newCampaign?: null,
+      _sharesRoot?: null,
+      _sharesTotal?: null,
+      _uri?: null,
+      _guardian?: null,
+      _oracle?: null,
+      _sharesPublished?: null,
+      _claimPeriodStart?: null,
+      salt?: null
     ): CampaignCreatedEventFilter;
   };
 
@@ -146,6 +188,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -158,6 +201,7 @@ export interface CampaignFactory extends BaseContract {
       _oracle: string,
       _sharesPublished: boolean,
       _claimPeriodStart: BigNumberish,
+      salt: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

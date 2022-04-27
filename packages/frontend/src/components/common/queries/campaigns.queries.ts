@@ -13,8 +13,9 @@ export function useCampaigns() {
     const query = `query { 
       campaigns { 
         id 
-        owner
-        merkleRoot
+        creator
+        address
+        sharesRoot
       }
     }`;
 

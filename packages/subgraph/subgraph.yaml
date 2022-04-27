@@ -19,6 +19,6 @@ dataSources:
         - name: CampaignFactory
           file: ./abis/CampaignFactory.sol/CampaignFactory.json
       eventHandlers:
-        - event: CampaignCreated(address,address,bytes32,bytes32,uint256,address,bytes32)
+        - event: CampaignCreated(address,address,bytes32,uint256,bytes32,address,address,bool,uint256,bytes32)
           handler: handleCampaignCreated
       file: ./mapping.ts
