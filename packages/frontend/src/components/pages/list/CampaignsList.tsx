@@ -28,10 +28,9 @@ export const CampaignsList: FC<ICampaignListProps> = (props: ICampaignListProps)
       {campaigns ? (
         campaigns.map((campaign: any) => {
           return (
-            <>
-              <p>{campaign.id}</p>
-              <p>{campaign.owner}</p>
-            </>
+            <div key={campaign.id}>
+              <Link to={`/campaign/${campaign.address}`}>{campaign.address}</Link>
+            </div>
           );
         })
       ) : (

@@ -14,6 +14,7 @@ export function useCampaigns() {
       campaigns { 
         id 
         creator
+        address
         sharesRoot
       }
     }`;
