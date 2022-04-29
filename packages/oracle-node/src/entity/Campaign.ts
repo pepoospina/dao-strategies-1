@@ -1,13 +1,13 @@
-import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryColumn, OneToMany } from "typeorm";
 import { Reward } from "./Reward";
 
 @Entity()
-export class User {
+export class Campaign {
   @PrimaryColumn()
-  id: string;
+  uri: number;
 
   @Column()
-  rewardsAddress: string;
+  executionTime: number;
 
   @OneToMany(() => Reward, (reward) => reward.campaign)
   rewards: Reward[];

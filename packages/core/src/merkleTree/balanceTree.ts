@@ -1,11 +1,7 @@
 import { BigNumber, utils } from "ethers";
+import { AccountAndBalance } from "~~/types";
 
-import MerkleTree from "./merkle-tree";
-
-export interface AccountAndBalance {
-  account: string;
-  balance: BigNumber;
-}
+import MerkleTree from "./merkleTree";
 
 export class BalanceTree {
   private readonly tree: MerkleTree;
