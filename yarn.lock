@@ -576,7 +576,6 @@ __metadata:
   dependencies:
     "@ant-design/icons": ^4.7.0
     "@babel/runtime": ^7.17.2
-    "@dao-strategies/core": ^0.0.0
     "@dethcrypto/eth-sdk": ^0.3.0
     "@emotion/react": ^11.8.1
     "@emotion/types": ^0.7.0
