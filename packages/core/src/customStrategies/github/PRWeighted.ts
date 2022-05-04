@@ -1,4 +1,4 @@
-import { AccountAndBalance, Strategy, StrategyGate } from "~~/types";
+import { Balances, Strategy, StrategyGate } from "~~/types";
 import { World } from "~~/world/World";
 
 interface Params {
@@ -9,10 +9,10 @@ const strategy: Strategy = async (
   world: World,
   params: Params,
   accounts: Set<string>
-): Promise<AccountAndBalance[]> => {
+): Promise<Balances> => {
   const prs = world.github.rest.pulls.list(params.repositories[0]);
   console.log({ prs });
-  return [];
+  return new Map();
 };
 
 const gate: StrategyGate = async (world: World, params: Params) => {

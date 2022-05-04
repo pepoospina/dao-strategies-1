@@ -1,5 +1,5 @@
 import { BigNumber, utils } from "ethers";
-import { AccountAndBalance } from "~~/types";
+import { Balances } from "~~/types";
 
 import MerkleTree from "./merkleTree";
 
@@ -7,13 +7,11 @@ export class BalanceTree {
   private readonly tree: MerkleTree;
   readonly totalSupply: BigNumber;
 
-  constructor(balances: AccountAndBalance[]) {
-    this.totalSupply = balances.reduce(
-      (sum, claimer) => (sum = sum.add(claimer.balance)),
-      BigNumber.from(0)
-    );
+  constructor(balances: Balances) {
+    this.totalSupply = BigNumber.from(0);
+    balances.forEach((balance) => this.totalSupply.add(balance));
     this.tree = new MerkleTree(
-      balances.map(({ account, balance }, index) => {
+      Array.from(balances.entries()).map(([account, balance]) => {
         return BalanceTree.toNode(account, balance);
       })
     );
