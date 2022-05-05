@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { Balances, Strategy, StrategyGate } from '~~/types';
 import { World } from '~~/world/World';
 
@@ -8,21 +9,23 @@ interface Params {
 const strategy: Strategy = async (
   world: World,
   params: Params,
-  accounts: Set<string>
+  accounts: Set<string> | undefined
 ): Promise<Balances> => {
-  try {
-    const prs = await world.github.rest.pulls.list(params.repositories[0]);
-    console.log({ prs });
-  } catch (e) {
-    console.log('here');
-    console.log(e);
-  }
+  const prs = await world.github.rest.pulls.list(params.repositories[0]);
 
-  return new Map();
+  const rewards: Balances = new Map();
+  prs.data.forEach((pr) => {
+    if (pr.user === null) throw new Error('pr user undefined');
+    const author = pr.user.login;
+    const reward = BigNumber.from(1000);
+    rewards.set(author, reward);
+  });
+
+  return rewards;
 };
 
 const gate: StrategyGate = async (world: World, params: Params) => {
-  return new Set([]);
+  return undefined;
 };
 
 export type { Params };

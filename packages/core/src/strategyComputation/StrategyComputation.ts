@@ -1,7 +1,7 @@
-import { strategies } from "~~/customStrategies";
-import { StrategyID } from "~~/customStrategies/list";
-import { Balances } from "~~/types";
-import { World, WorldConfig } from "~~/world/World";
+import { strategies } from '~~/customStrategies';
+import { StrategyID } from '~~/customStrategies/list';
+import { Balances } from '~~/types';
+import { World, WorldConfig } from '~~/world/World';
 
 export class StrategyComputation {
   protected world: World;
@@ -15,19 +15,28 @@ export class StrategyComputation {
       this.world,
       params
     );
+
     const rewards = await strategies[strategyId].strategy(
       this.world,
       params,
       eligibleAccounts
     );
 
-    const validRewards: Balances = new Map();
+    let validRewards: Balances = new Map();
 
-    rewards.forEach((balance, account) => {
-      if (eligibleAccounts.has(account)) {
-        validRewards.set(account, balance);
-      }
-    });
+    if (eligibleAccounts !== undefined) {
+      // filter rewards for only eligible accounts
+      rewards.forEach((balance, account) => {
+        if (eligibleAccounts.has(account)) {
+          validRewards.set(account, balance);
+        }
+      });
+    } else {
+      /** overwrite valid rewards with the original rewards Balances */
+      validRewards = rewards;
+    }
+
+    console.log({ validRewards });
 
     return validRewards;
   }

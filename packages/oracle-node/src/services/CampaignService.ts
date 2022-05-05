@@ -1,8 +1,4 @@
-import {
-  Balances,
-  StrategyComputation,
-  StrategyID,
-} from '@dao-strategies/core';
+import { StrategyComputation, StrategyID } from '@dao-strategies/core';
 
 import { worldConfig } from '../config';
 import { Prisma } from '@prisma/client';
@@ -55,6 +51,11 @@ export class CampaignService {
   }
 
   async runStrategy(strategyId: StrategyID, strategyParams: any) {
-    return this.strategyComputation.runStrategy(strategyId, strategyParams);
+    const rewards = await this.strategyComputation.runStrategy(
+      strategyId,
+      strategyParams
+    );
+
+    return rewards;
   }
 }

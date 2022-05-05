@@ -15,10 +15,10 @@ function handleError(err, req, res, next) {
   res.status(err.statusCode || 500).send({ message: err.message });
 }
 
-export const logger = winston.createLogger({
+export const oracleLogger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
   ],
 });
 
@@ -35,7 +35,7 @@ app.use(cors(corsOptions));
 /** Logger configuration */
 app.use(
   expressWinston.logger({
-    transports: logger.transports,
+    transports: oracleLogger.transports,
     format: winston.format.combine(
       winston.format.colorize(),
       winston.format.json()
@@ -68,7 +68,7 @@ Routes.forEach((route) => {
         res.json(result);
       } catch (error) {
         throw error;
-        logger.error(error.message);
+        oracleLogger.error(error.message);
         next(error);
       }
     }
