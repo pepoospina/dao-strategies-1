@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as winston from 'winston';
 import * as expressWinston from 'express-winston';
+import * as cors from 'cors';
 import { Request, Response } from 'express';
 
 import { Routes } from './enpoints/routes';
@@ -24,6 +25,14 @@ export const logger = winston.createLogger({
 // create express app
 const app = express();
 
+/** CORS configuration */
+var corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
+
+/** Logger configuration */
 app.use(
   expressWinston.logger({
     transports: logger.transports,
@@ -31,17 +40,18 @@ app.use(
       winston.format.colorize(),
       winston.format.json()
     ),
-    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-    colorize: true, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+    expressFormat: true,
+    colorize: true,
     ignoreRoute: function (req, res) {
-      return false;
+      return true;
     },
   })
 );
 
+/** JSON body parser */
 app.use(bodyParser.json());
 
-// register express routes from defined application routes
+/** Register routes */
 Routes.forEach((route) => {
   (app as any)[route.method](
     route.route,
@@ -57,14 +67,13 @@ Routes.forEach((route) => {
         );
         res.json(result);
       } catch (error) {
+        throw error;
+        logger.error(error.message);
         next(error);
       }
     }
   );
 });
-
-// setup express app here
-// ...
 
 // start express server
 app.use(handleError);

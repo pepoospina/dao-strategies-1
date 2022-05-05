@@ -9,6 +9,14 @@
       "runtimeExecutable": "${workspaceFolder}/packages/contracts/node_modules/.bin/hardhat",
       "args": ["test", "--network", "localhost"],
       "cwd": "${workspaceFolder}/packages/contracts"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "oracle",
+      "processId": "${command:PickProcess}",
+      "restart": true,
+      "protocol": "inspector"
     }
   ]
 }

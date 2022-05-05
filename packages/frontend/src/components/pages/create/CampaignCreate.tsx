@@ -18,6 +18,16 @@ export interface ICampaignCreateProps {
 
 const { Option } = Select;
 
+interface CampaignFormValues {
+  campaignType: string;
+  repository: string;
+}
+
+interface RequestParams {
+  strategyID: string;
+  strategyParams: Object;
+}
+
 export const CampaignCreate: FC<ICampaignCreateProps> = () => {
   const ethersContext = useEthersContext();
   const [campaignType, setCampaignType] = useState();
@@ -64,17 +74,27 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
 
   const [form] = Form.useForm();
 
-  const initialValues = { campaignType: 'github', repository: '' };
+  const initialValues: CampaignFormValues = { campaignType: 'github', repository: '' };
+
+  const getStrategyParams = (values: CampaignFormValues): RequestParams | undefined => {
+    switch (values.campaignType) {
+      case 'github':
+        return { strategyID: 'GH_PR_Weigthed', strategyParams: { repositories: [values.repository] } };
+    }
+    return undefined;
+  };
 
   const onCampaignTypeSelected = (value: string): void => {
     form.setFieldsValue({ campaignType: value });
   };
 
-  const onFinish = async (values: any): Promise<void> => {
+  const onFinish = async (values: CampaignFormValues): Promise<void> => {
+    const reqParams = getStrategyParams(values);
+
     await fetch(ORACLE_NODE_URL + '/campaign/simulate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values }),
+      body: JSON.stringify(reqParams),
     });
   };
 

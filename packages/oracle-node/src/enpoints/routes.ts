@@ -11,6 +11,6 @@ export const Routes = [
     method: 'post',
     route: '/campaign/simulate',
     controller: CampaignController,
-    action: 'runStrategy',
+    action: 'simulate',
   },
 ];

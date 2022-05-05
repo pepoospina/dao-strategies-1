@@ -26,10 +26,11 @@ export class CampaignController extends Controller {
     super(services);
   }
   async simulate(request: Request, response: Response, next: NextFunction) {
-    logger.info({ request });
+    // logger.info({ body: request.body });
     const rewards = await this.services.campaign.runStrategy(
       request.body.strategyID as StrategyID,
       request.body.strategyParams
     );
+    logger.info('rewards: ', { rewards: JSON.stringify(rewards) });
   }
 }
