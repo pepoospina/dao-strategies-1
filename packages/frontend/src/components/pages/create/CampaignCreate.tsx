@@ -33,7 +33,7 @@ interface RequestParams {
 
 export const CampaignCreate: FC<ICampaignCreateProps> = () => {
   const ethersContext = useEthersContext();
-  const [campaignType, setCampaignType] = useState();
+  const [rewards, setRewards] = useState<unknown>({});
 
   const campaignFactoryContract = useAppContracts('CampaignFactory', ethersContext.chainId);
   const history = useHistory();
@@ -101,14 +101,18 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
   const onFinish = async (values: CampaignFormValues): Promise<void> => {
     const reqParams = getStrategyParams(values);
 
-    await fetch(ORACLE_NODE_URL + '/campaign/simulate', {
+    const response = await fetch(ORACLE_NODE_URL + '/campaign/simulate', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqParams),
     });
+
+    const rew = await (response.json() as Promise<unknown>);
+    setRewards(rew);
   };
 
   const onReset = (): void => {
+    setRewards({});
     form.resetFields();
   };
 
@@ -154,6 +158,18 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
           </Button>
         </Form.Item>
       </Form>
+
+      <div>
+        <ul>
+          {Object.entries(rewards).map((entry) => {
+            return (
+              <li key={entry[0]}>
+                {entry[0]}: {entry[1]}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </>
   );
 };
