@@ -20,12 +20,15 @@ const { Option } = Select;
 
 interface CampaignFormValues {
   campaignType: string;
-  repository: string;
+  repositoryOwner: string;
+  repositoryName: string;
 }
 
 interface RequestParams {
   strategyID: string;
-  strategyParams: Object;
+  strategyParams: {
+    repositories: Array<{ owner: string; repo: string }>;
+  };
 }
 
 export const CampaignCreate: FC<ICampaignCreateProps> = () => {
@@ -74,12 +77,19 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
 
   const [form] = Form.useForm();
 
-  const initialValues: CampaignFormValues = { campaignType: 'github', repository: '' };
+  const initialValues: CampaignFormValues = {
+    campaignType: 'github',
+    repositoryOwner: 'ethereum',
+    repositoryName: 'go-ethereum',
+  };
 
   const getStrategyParams = (values: CampaignFormValues): RequestParams | undefined => {
     switch (values.campaignType) {
       case 'github':
-        return { strategyID: 'GH_PR_Weigthed', strategyParams: { repositories: [values.repository] } };
+        return {
+          strategyID: 'GH_PR_Weigthed',
+          strategyParams: { repositories: [{ owner: values.repositoryOwner, repo: values.repositoryName }] },
+        };
     }
     return undefined;
   };
@@ -123,7 +133,10 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
             <Option value="twitter">Twitter (coming soon)</Option>
           </Select>
         </Form.Item>
-        <Form.Item name="repository" label="Repository" rules={[{ required: true }]}>
+        <Form.Item name="repositoryOwner" label="Repository Owner" rules={[{ required: true }]}>
+          <Input></Input>
+        </Form.Item>
+        <Form.Item name="repositoryName" label="Repository Name" rules={[{ required: true }]}>
           <Input></Input>
         </Form.Item>
         <Form.Item name="fromDate" label="Start counting on">
@@ -134,7 +147,7 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
         </Form.Item>
         <Form.Item {...tailLayout}>
           <Button type="primary" htmlType="submit">
-            Create
+            Simulate
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset

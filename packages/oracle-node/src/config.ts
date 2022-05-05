@@ -1,9 +1,9 @@
-import { WorldConfig } from "@dao-strategies/core";
+import { WorldConfig } from '@dao-strategies/core';
 
-require("dotenv").config();
+require('dotenv').config();
 
 export const worldConfig: WorldConfig = {
-  GITHUB_TOKEN: "",
+  GITHUB_TOKEN: process.env.GITHUB_TOKEN,
 };
 
 export const port = process.env.PORT;
