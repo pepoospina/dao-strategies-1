@@ -1,2 +1,4 @@
-export * from "./merkle-tree/balance-tree";
-export * from "./merkle-tree/merkle-tree";
+export * from "./merkleTree";
+export * from "./strategyComputation";
+export * from "./customStrategies";
+export * from "./types";
