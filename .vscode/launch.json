@@ -12,11 +12,12 @@
     },
     {
       "type": "node",
-      "request": "attach",
+      "request": "launch",
       "name": "oracle",
-      "processId": "${command:PickProcess}",
-      "restart": true,
-      "protocol": "inspector"
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}/packages/oracle-node",
+      "runtimeExecutable": "${workspaceFolder}/packages/oracle-node/node_modules/.bin/ts-node",
+      "args": ["src/index.ts"]
     }
   ]
 }
