@@ -540,7 +540,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dao-strategies/core@workspace:packages/core"
   dependencies:
-    "@types/node": ^17.0.23
+    "@types/node": ^17.0.31
     dotenv: ^16.0.0
     ethereumjs-util: ^7.1.4
     ethers: ^5.5.4
@@ -2918,6 +2918,13 @@ __metadata:
   version: 16.11.26
   resolution: "@types/node@npm:16.11.26"
   checksum: 57757caaba3f0d95de82198cb276a1002c49b710108c932a1d02d7c91ff2fa57cfe2dd19fde60853b6dd90b0964b3cf35557981d2628e20aed6a909057aedfe6
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^17.0.31":
+  version: 17.0.31
+  resolution: "@types/node@npm:17.0.31"
+  checksum: 704618350f8420d5c47db0f7778398e821b7724369946f5c441a7e6b9343295553936400eb8309f0b07d5e39c240988ab3456b983712ca86265dabc9aee4ad3d
   languageName: node
   linkType: hard
 

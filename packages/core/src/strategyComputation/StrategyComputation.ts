@@ -1,5 +1,5 @@
-import { strategies } from "../customStrategies";
-import { StrategyID } from "../customStrategies/list";
+import { strategies } from "../strategies";
+import type { Strategy_ID } from "../strategies";
 import { World, WorldConfig } from "../world/World";
 
 export class StrategyComputation {
@@ -9,19 +9,10 @@ export class StrategyComputation {
     this.world = new World(config);
   }
 
-  async runStrategy(strategyId: StrategyID, params: any) {
-    const eligibleAccounts = await strategies[strategyId].gate(
+  async runStrategy(strategyId: Strategy_ID, params: any) {
+    const rewards = await strategies[strategyId](
       this.world,
       params
-    );
-    const rewards = await strategies[strategyId].strategy(
-      this.world,
-      params,
-      eligibleAccounts
-    );
-
-    const validRewards = rewards.filter((accBalance) =>
-      eligibleAccounts.has(accBalance.account)
     );
   }
 }

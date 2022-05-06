@@ -1,16 +1,15 @@
 import { BigNumber } from "ethers";
 
-import { World } from "./world/World";
+import { World, WorldConfig } from "./world/World";
 
 export interface AccountAndBalance {
   account: string;
   balance: BigNumber;
 }
 
-export type StrategyGate = (world: World, params: any) => Promise<Set<string>>;
-
 export type Strategy = (
   world: World,
-  params: any,
-  accounts: Set<string>
+  params: any
 ) => Promise<AccountAndBalance[]>;
+
+export type { WorldConfig };
