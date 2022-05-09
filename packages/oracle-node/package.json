@@ -8,7 +8,8 @@
     "migrate": "cd ./src &&  npx prisma migrate dev --name init && cd ..",
     "reset": "cd ./src &&  npx prisma migrate reset --preview-feature && cd ..",
     "generate": "cd ./src && npx prisma generate && cd ..",
-    "start": "nodemon src/index.ts"
+    "start": "nodemon src/index.ts",
+    "lint": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*.ts"
   },
   "dependencies": {
     "@dao-strategies/core": "^0.0.0",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^16.11.10",
     "dotenv": "^16.0.0",
+    "eslint": "^8.15.0",
     "nodemon": "^2.0.15",
     "ts-node": "10.7.0",
     "typescript": "4.5.2"

@@ -2,6 +2,7 @@ import { StrategyID } from '@dao-strategies/core';
 import { Campaign, Reward } from '@prisma/client';
 import { CID } from 'multiformats/cid';
 import * as json from 'multiformats/codecs/json';
+import * as raw from 'multiformats/codecs/raw';
 import { sha256 } from 'multiformats/hashes/sha2';
 
 export interface CampaignUriDetails {
@@ -41,5 +42,6 @@ export const getRewardUri = async (
   account: string
 ): Promise<string> => {
   const bytes = Buffer.from(uri + account);
-  return sha256.digest(bytes).toString();
+  const hash = await sha256.digest(bytes);
+  return CID.create(1, raw.code, hash).toString();
 };

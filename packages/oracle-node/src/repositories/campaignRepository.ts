@@ -26,6 +26,10 @@ export class CampaignRepository {
       select: { lastSimDate: true },
     });
 
+    if (result === null) {
+      return undefined;
+    }
+
     /** "BigInt" in the DB to support timestamps beyond 2038, "number" in JS */
     return result.lastSimDate === null
       ? undefined
@@ -64,16 +68,7 @@ export class CampaignRepository {
       },
     });
 
-    const addNew = this.client.campaign.update({
-      where: {
-        uri: uri,
-      },
-      data: {
-        rewards: {
-          createMany: { data: rewardsArray },
-        },
-      },
-    });
+    const addNew = this.client.reward.createMany({ data: rewardsArray });
 
     await this.client.$transaction([deleteExisting, addNew]);
   }
