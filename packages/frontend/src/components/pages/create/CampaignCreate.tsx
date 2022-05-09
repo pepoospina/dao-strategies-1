@@ -1,12 +1,10 @@
 import { Button, DatePicker, Form, Input, Select } from 'antd';
-
-// import { transactor } from 'eth-components/functions';
 import { useEthersContext } from 'eth-hooks/context';
 import { BigNumber, ethers } from 'ethers';
 import { FC, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ORACLE_NODE_URL } from '~~/config/appConfig';
 
+import { ORACLE_NODE_URL } from '~~/config/appConfig';
 import { useAppContracts } from '~~/config/contractContext';
 import { CampaignCreatedEvent } from '~~/generated/typechain/CampaignFactory';
 
@@ -33,15 +31,12 @@ interface RequestParams {
 
 export const CampaignCreate: FC<ICampaignCreateProps> = () => {
   const ethersContext = useEthersContext();
-  const [rewards, setRewards] = useState<unknown>({});
+  const [rewards, setRewards] = useState<Record<string, unknown>>({});
 
   const campaignFactoryContract = useAppContracts('CampaignFactory', ethersContext.chainId);
   const history = useHistory();
 
   const createCampaign = async (): Promise<void> => {
-    /* look how you call setPurpose on your contract: */
-    /* notice how you pass a call back for tx updates too */
-
     const account = ethersContext.account;
     if (account === undefined) throw new Error('account undefined');
     const salt = ethers.utils.keccak256(ethers.utils.hashMessage(account + Date.now().toString()));
@@ -98,7 +93,7 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
     form.setFieldsValue({ campaignType: value });
   };
 
-  const onFinish = async (values: CampaignFormValues): Promise<void> => {
+  const updateRewards = async (values: CampaignFormValues): Promise<void> => {
     const reqParams = getStrategyParams(values);
 
     const response = await fetch(ORACLE_NODE_URL + '/campaign/simulate', {
@@ -107,13 +102,22 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
       body: JSON.stringify(reqParams),
     });
 
-    const rew = await (response.json() as Promise<unknown>);
+    const rew = await (response.json() as Promise<Record<string, unknown>>);
     setRewards(rew);
+  };
+
+  const onSimulate = (values: CampaignFormValues): void => {
+    void updateRewards(values);
   };
 
   const onReset = (): void => {
     setRewards({});
     form.resetFields();
+  };
+
+  const onCreate = (): void => {
+    console.log('create');
+    void createCampaign();
   };
 
   const layout = {
@@ -130,7 +134,7 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
       <Link to="/">Back</Link>
       <br></br>
       <br></br>
-      <Form {...layout} initialValues={initialValues} form={form} name="control-hooks" onFinish={onFinish}>
+      <Form {...layout} initialValues={initialValues} form={form} name="control-hooks" onFinish={onSimulate}>
         <Form.Item name="campaignType" label="Type" rules={[{ required: true }]}>
           <Select onChange={onCampaignTypeSelected} allowClear>
             <Option value="github">Github</Option>
@@ -155,6 +159,9 @@ export const CampaignCreate: FC<ICampaignCreateProps> = () => {
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset
+          </Button>
+          <Button htmlType="button" onClick={onCreate} disabled={Object.keys(rewards).length === 0}>
+            Create
           </Button>
         </Form.Item>
       </Form>

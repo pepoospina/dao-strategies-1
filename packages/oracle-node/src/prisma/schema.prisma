@@ -8,18 +8,20 @@ generator client {
 }
 
 model Campaign {
-  uri           String    @id
-  title         String
-  description   String
-  creator       User      @relation(fields: [creatorId], references: [id])
-  creatorId     Int    
-  guardian      String
-  oracle        String
-  execDate      DateTime
-  cancelDate    DateTime
-  stratID       String
-  stratParams   String    // For now, Params are stringified as they can have any structure
-  rewards       Reward[] 
+  uri             String    @id
+  title           String
+  description     String
+  creator         User      @relation(fields: [creatorId], references: [address])
+  creatorId       String    
+  nonce           Int
+  guardian        String
+  oracle          String
+  execDate        BigInt
+  cancelDate      BigInt
+  stratID         String
+  stratParamsStr  String    // For now, Params are stringified as they can have any structure
+  rewards         Reward[] 
+  lastSimDate     BigInt
 }
 
 enum CampaignState {
@@ -29,16 +31,15 @@ enum CampaignState {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  address       String    @unique
-  rewards       Reward[]
-  created       Campaign[]
-}
+  address         String    @id
+  github          String
+  created         Campaign[]
+} 
 
-model Reward {
-  id            Int       @id @default(autoincrement())
-  user          User      @relation(fields: [userId], references: [id])
-  userId        Int
-  campaign      Campaign  @relation(fields: [campaignId], references: [uri])
-  campaignId    String
+model Reward {  
+  id              String    @id   // id is hash(uri+account)
+  account         String
+  amount          BigInt        
+  campaign        Campaign  @relation(fields: [campaignId], references: [uri])
+  campaignId      String
 }

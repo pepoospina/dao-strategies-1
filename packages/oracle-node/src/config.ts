@@ -7,3 +7,6 @@ export const worldConfig: WorldConfig = {
 };
 
 export const port = process.env.PORT;
+
+/** Resimulate rewards every X seconds*/
+export const resimulationPeriod: number = 30;

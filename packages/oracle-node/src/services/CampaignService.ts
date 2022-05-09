@@ -1,8 +1,13 @@
-import { StrategyComputation, StrategyID } from '@dao-strategies/core';
+import {
+  Balances,
+  StrategyComputation,
+  StrategyID,
+} from '@dao-strategies/core';
+import { Campaign, Prisma } from '@prisma/client';
 
 import { worldConfig } from '../config';
-import { Prisma } from '@prisma/client';
 import { CampaignRepository } from '../repositories/campaignRepository';
+import { CampaignUriDetails, campaigToCampaignUriDetails } from './CampaignUri';
 
 /**
  * On Retroactive Campaign
@@ -21,13 +26,10 @@ import { CampaignRepository } from '../repositories/campaignRepository';
  */
 
 export class CampaignService {
-  private campaignRepo: CampaignRepository;
-  private strategyComputation: StrategyComputation;
-
-  constructor() {
-    this.campaignRepo = new CampaignRepository();
-    this.strategyComputation = new StrategyComputation(worldConfig);
-  }
+  constructor(
+    protected campaignRepo: CampaignRepository,
+    protected strategyComputation: StrategyComputation
+  ) {}
 
   /** A campaign is considered created once its smart contract is deployed. This endpoint
    * informs the oracle node about the existence of such a campaign. Once registered
@@ -43,19 +45,54 @@ export class CampaignService {
   async execute(uri: string): Promise<void> {
     const campaign = await this.campaignRepo.get(uri);
 
-    const params = JSON.parse(campaign.stratParams);
-    const rewards = await this.runStrategy(
+    const params = JSON.parse(campaign.stratParamsStr);
+    const rewards = await this.strategyComputation.runStrategy(
       campaign.stratID as StrategyID,
       params
     );
   }
 
-  async runStrategy(strategyId: StrategyID, strategyParams: any) {
+  async simulate(strategyId: StrategyID, strategyParams: any) {
     const rewards = await this.strategyComputation.runStrategy(
       strategyId,
       strategyParams
     );
 
     return rewards;
+  }
+
+  async get(uri: string): Promise<Campaign | undefined> {
+    return this.campaignRepo.get(uri);
+  }
+
+  async validateOrGetDetails(
+    uri: string,
+    details?: CampaignUriDetails
+  ): Promise<CampaignUriDetails> {
+    let validDatails: CampaignUriDetails;
+
+    if (details === undefined) {
+      const readCampaign = await this.get(uri);
+      if (readCampaign === undefined) {
+        throw new Error(`details not provided nor found for campaiagn ${uri}`);
+      }
+      validDatails = campaigToCampaignUriDetails(readCampaign);
+    } else {
+      validDatails = details;
+    }
+
+    return validDatails;
+  }
+
+  async getLastSimDate(uri: string): Promise<number | undefined> {
+    return this.campaignRepo.getLastSimDate(uri);
+  }
+
+  async getRewards(uri: string): Promise<Balances> {
+    return this.campaignRepo.getRewards(uri);
+  }
+
+  async setRewards(uri: string, rewards: Balances): Promise<void> {
+    return this.campaignRepo.setRewards(uri, rewards);
   }
 }

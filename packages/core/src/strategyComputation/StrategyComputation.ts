@@ -11,16 +11,9 @@ export class StrategyComputation {
   }
 
   async runStrategy(strategyId: StrategyID, params: any): Promise<Balances> {
-    const eligibleAccounts = await strategies[strategyId].gate(
-      this.world,
-      params
-    );
+    const eligibleAccounts = await strategies[strategyId].gate(this.world, params);
 
-    const rewards = await strategies[strategyId].strategy(
-      this.world,
-      params,
-      eligibleAccounts
-    );
+    const rewards = await strategies[strategyId].strategy(this.world, params, eligibleAccounts);
 
     let validRewards: Balances = new Map();
 
