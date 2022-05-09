@@ -6,10 +6,13 @@ import * as cors from 'cors';
 import { Request, Response } from 'express';
 
 import { Routes } from './enpoints/routes';
-import { port } from './config';
+import { port, worldConfig } from './config';
 import { Services } from './types';
 
 import { CampaignService } from './services/CampaignService';
+import { CampaignRepository } from './repositories/campaignRepository';
+import { StrategyComputation } from '@dao-strategies/core';
+import { TimeService } from './services/TimeService';
 
 function handleError(err, req, res, next) {
   res.status(err.statusCode || 500).send({ message: err.message });
@@ -57,8 +60,11 @@ Routes.forEach((route) => {
     route.route,
     async (req: Request, res: Response, next: Function) => {
       try {
+        const campaignRepo = new CampaignRepository();
+        const strategyComputation = new StrategyComputation(worldConfig);
         const repos: Services = {
-          campaign: new CampaignService(),
+          campaign: new CampaignService(campaignRepo, strategyComputation),
+          time: new TimeService(),
         };
         const result = await new (route.controller as any)(repos)[route.action](
           req,

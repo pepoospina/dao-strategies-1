@@ -5,9 +5,8 @@ import {
 } from '@dao-strategies/core';
 import { Campaign, Prisma } from '@prisma/client';
 
-import { worldConfig } from '../config';
 import { CampaignRepository } from '../repositories/campaignRepository';
-import { CampaignUriDetails, campaigToCampaignUriDetails } from './CampaignUri';
+import { campaignToUriDetails, CampaignUriDetails } from './CampaignUri';
 
 /**
  * On Retroactive Campaign
@@ -76,7 +75,7 @@ export class CampaignService {
       if (readCampaign === undefined) {
         throw new Error(`details not provided nor found for campaiagn ${uri}`);
       }
-      validDatails = campaigToCampaignUriDetails(readCampaign);
+      validDatails = campaignToUriDetails(readCampaign);
     } else {
       validDatails = details;
     }

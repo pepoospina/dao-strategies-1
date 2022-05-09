@@ -12,19 +12,21 @@ export interface CampaignUriDetails {
   strategyParams: Object;
 }
 
-export const campaignToUriDetails = (campaign: Campaign): CampaignUriDetails => {
+export const campaignToUriDetails = (
+  campaign: Campaign
+): CampaignUriDetails => {
   return {
     creator: campaign.creatorId,
-    execData: campaign.execDate,
+    execData: campaign.execDate as unknown as number,
     nonce: campaign.nonce,
     strategyID: campaign.stratID as StrategyID,
-    strategyParams: JSON.parse(campaign.stratParamsStr).
-  }
-}
+    strategyParams: JSON.parse(campaign.stratParamsStr),
+  };
+};
 
 export const campaigToCampaignUri = (campaign: Campaign): Promise<string> => {
   return getCampaignUri(campaignToUriDetails(campaign));
-}
+};
 
 export const getCampaignUri = async (
   campaignDetails: CampaignUriDetails
@@ -35,8 +37,9 @@ export const getCampaignUri = async (
 };
 
 export const getRewardUri = async (
-  uri: string, account: string
+  uri: string,
+  account: string
 ): Promise<string> => {
   const bytes = Buffer.from(uri + account);
   return sha256.digest(bytes).toString();
-}
+};

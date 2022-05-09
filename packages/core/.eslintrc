@@ -8,7 +8,7 @@
       "jsx": true // Allows for the parsing of JSX,
     },
     "project": "tsconfig.json",
-    "tsconfigRootDir": ".",
+    "tsconfigRootDir": "__dirname",
     "projectFolderIgnoreList": ["node_modules/*", "node_modules", "dist", ".yarn"]
   },
   "env": {
