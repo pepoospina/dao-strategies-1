@@ -540,6 +540,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dao-strategies/core@workspace:packages/core"
   dependencies:
+    "@octokit/plugin-rest-endpoint-methods": ^5.13.0
     "@types/node": ^17.0.31
     dotenv: ^16.0.0
     ethereumjs-util: ^7.1.4
@@ -1954,7 +1955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0":
+"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0, @octokit/plugin-rest-endpoint-methods@npm:^5.13.0":
   version: 5.13.0
   resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.13.0"
   dependencies:
