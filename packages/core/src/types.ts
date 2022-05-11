@@ -10,6 +10,6 @@ export interface AccountAndBalance {
 export type Strategy = (
   world: World,
   params: any
-) => Promise<Record<string, number>>;
+) => Promise<Map<string, number>>;
 
 export type { WorldConfig };

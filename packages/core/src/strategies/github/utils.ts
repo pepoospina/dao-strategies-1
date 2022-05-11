@@ -32,7 +32,7 @@ export async function getPrsInRepo(world: World, repo: { owner: string, repo: st
 }
 
 
-export async function getRepoContributors(world: World, repo: { owner: string, repo: string }) {
+export async function getRepoContributors(world: World, repo: { owner: string, repo: string }): Promise<Array<string | undefined>> {
     if (!(await repoAvailable(world, repo))) {
         throw new Error(`repo ${repo.owner}\\${repo.repo} is not available`);
     }
@@ -42,7 +42,8 @@ export async function getRepoContributors(world: World, repo: { owner: string, r
     if (response.status != 200) {
         throw new Error(`github api get request for contributors in repo ${repo.owner}\\${repo.repo} failed`);
     }
-    return response.data;
+
+    return response.data.map((contributorData) => contributorData.login);
 }
 
 
