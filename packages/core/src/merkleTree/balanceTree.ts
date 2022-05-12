@@ -1,7 +1,7 @@
-import { BigNumber, utils } from "ethers";
-import { Balances } from "~~/types";
+import { BigNumber, utils } from 'ethers';
+import { Balances } from '~~/types';
 
-import MerkleTree from "./merkleTree";
+import MerkleTree from './merkleTree';
 
 export class BalanceTree {
   private readonly tree: MerkleTree;
@@ -36,9 +36,9 @@ export class BalanceTree {
   public static toNode(account: string, allocation: BigNumber): Buffer {
     const hash = Buffer.from(
       utils
-        .solidityKeccak256(["address", "uint256"], [account, allocation])
+        .solidityKeccak256(['address', 'uint256'], [account, allocation])
         .substr(2),
-      "hex"
+      'hex'
     );
     return hash;
   }

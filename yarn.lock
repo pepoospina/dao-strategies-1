@@ -558,14 +558,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dao-strategies/core@workspace:packages/core"
   dependencies:
-    "@types/node": ^17.0.23
-    "@typescript-eslint/eslint-plugin": ^5.12.0
-    "@typescript-eslint/parser": ^5.12.0
-    eslint: ^8.9.0
-    eslint-config-prettier: ^8.4.0
-    eslint-plugin-import: ^2.25.4
-    eslint-plugin-prettier: ^4.0.0
-    eslint-plugin-unused-imports: ^2.0.0
+    "@octokit/plugin-rest-endpoint-methods": ^5.13.0
+    "@types/node": ^17.0.31
+    dotenv: ^16.0.0
     ethereumjs-util: ^7.1.4
     ethers: ^5.5.4
     octokit: ^1.7.1
@@ -2085,7 +2080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0":
+"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0, @octokit/plugin-rest-endpoint-methods@npm:^5.13.0":
   version: 5.13.0
   resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.13.0"
   dependencies:
@@ -3077,6 +3072,13 @@ __metadata:
   version: 16.11.26
   resolution: "@types/node@npm:16.11.26"
   checksum: 57757caaba3f0d95de82198cb276a1002c49b710108c932a1d02d7c91ff2fa57cfe2dd19fde60853b6dd90b0964b3cf35557981d2628e20aed6a909057aedfe6
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^17.0.31":
+  version: 17.0.31
+  resolution: "@types/node@npm:17.0.31"
+  checksum: 704618350f8420d5c47db0f7778398e821b7724369946f5c441a7e6b9343295553936400eb8309f0b07d5e39c240988ab3456b983712ca86265dabc9aee4ad3d
   languageName: node
   linkType: hard
 
@@ -16908,15 +16910,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"on-finished@npm:2.4.1":
-  version: 2.4.1
-  resolution: "on-finished@npm:2.4.1"
-  dependencies:
-    ee-first: 1.1.1
-  checksum: d20929a25e7f0bb62f937a425b5edeb4e4cde0540d77ba146ec9357f00b0d497cdb3b9b05b9c8e46222407d1548d08166bff69cc56dfa55ba0e4469228920ff0
-  languageName: node
-  linkType: hard
-
 "on-finished@npm:~2.3.0":
   version: 2.3.0
   resolution: "on-finished@npm:2.3.0"
@@ -22936,15 +22929,6 @@ __metadata:
   dependencies:
     imurmurhash: ^0.1.4
   checksum: 5b6876a645da08d505dedb970d1571f6cebdf87044cb6b740c8dbb24f0d6e1dc8bdbf46825fd09f994d7cf50760e6f6e063cfa197d51c5902c00a861702eb75a
-  languageName: node
-  linkType: hard
-
-"unique-string@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "unique-string@npm:2.0.0"
-  dependencies:
-    crypto-random-string: ^2.0.0
-  checksum: ef68f639136bcfe040cf7e3cd7a8dff076a665288122855148a6f7134092e6ed33bf83a7f3a9185e46c98dddc445a0da6ac25612afa1a7c38b8b654d6c02498e
   languageName: node
   linkType: hard
 

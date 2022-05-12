@@ -6,6 +6,6 @@
   "arrowParens": "always",
   "bracketSameLine": true,
   "tabWidth": 2,
-  "printWidth": 120,
+  "printWidth": 80,
   "endOfLine": "lf"
 }
