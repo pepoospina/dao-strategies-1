@@ -1,20 +1,15 @@
 import { World } from "../../world/World";
-//import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
-//import { GetResponseTypeFromEndpointMethod } from "@octokit/types";
+import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
-//type PullRequestParams = RestEndpointMethodTypes["pulls"]["get"]["response"]["data"];
+type PullRequestParams = RestEndpointMethodTypes["pulls"]["list"]["response"]["data"];
 
-/*
-todo: get typing for the pulls. Tries using PullRequestParams but the type is not compatible with the returned pulls 
-from the iterator.
-https://github.com/octokit/plugin-rest-endpoint-methods.js#typescript 
-*/
+
 export async function getPrsInRepo(world: World, repo: { owner: string, repo: string }) {
-    if (!(await repoAvailable(world, repo))) {
+    if (!(await repoAvailable(world, repo))) { //do once in the strategy level
         throw new Error(`repo ${repo.owner}\\${repo.repo} is not available`);
     }
 
-    let allPulls = new Array();
+    let allPulls: PullRequestParams = new Array();
     const iterator = world.github.paginate.iterator(world.github.rest.pulls.list, {
         ...repo,
         state: "all",
