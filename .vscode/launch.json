@@ -19,6 +19,12 @@
       "runtimeExecutable": "${workspaceFolder}/packages/oracle-node/node_modules/.bin/ts-node",
       "args": ["src/index.ts"],
       "outputCapture": "std"
+    },
+    {
+      "name": "Launch Current Opened File",
+      "program": "${file}",
+      "request": "launch",
+      "type": "node"
     }
   ]
 }
