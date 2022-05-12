@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "rollup -w -c rollup.config.ts",
     "build": "rollup -c rollup.config.ts",
-    "lint": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*.ts"
+    "lint": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*.ts",
+    "lint-fix": "eslint --config ./.eslintrc --ignore-path ./.eslintignore ./src/**/*.ts --fix"
   },
   "dependencies": {
     "@octokit/plugin-rest-endpoint-methods": "^5.13.0",

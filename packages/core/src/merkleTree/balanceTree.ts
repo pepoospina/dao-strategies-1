@@ -1,7 +1,8 @@
 import { BigNumber, utils } from 'ethers';
-import { Balances } from '~~/types';
 
 import MerkleTree from './merkleTree';
+
+import { Balances } from '~~/types';
 
 export class BalanceTree {
   private readonly tree: MerkleTree;
