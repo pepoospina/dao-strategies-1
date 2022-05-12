@@ -44,6 +44,9 @@ const strategy: Strategy = async (world: World, params: Params) => {
 
     // get the amount of reactions on every pull request that was made by a contributor
     for (const pull of pullsFiltered) {
+      if (pull.user == null) {
+        continue;
+      }
       const pullCreator: string = pull.user.login;
       let reactionsNum = 1; // every pull has one default reaction
       const reactions = await getPullReactions(world, repo, pull.number);
