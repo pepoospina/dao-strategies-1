@@ -20,6 +20,12 @@ export class CampaignRepository {
     return this.client.campaign.findUnique({ where: { uri: uri } });
   }
 
+  async exist(uri: string): Promise<boolean> {
+    return this.client.campaign
+      .findFirst({ where: { uri: uri } })
+      .then(Boolean);
+  }
+
   async getLastSimDate(uri: string): Promise<number | undefined> {
     const result = await this.client.campaign.findUnique({
       where: { uri: uri },

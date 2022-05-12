@@ -8,7 +8,7 @@ import { sha256 } from 'multiformats/hashes/sha2';
 export interface CampaignUriDetails {
   creator: string;
   nonce: number;
-  execData: number;
+  execDate: number;
   strategyID: StrategyID;
   strategyParams: Object;
 }
@@ -18,7 +18,7 @@ export const campaignToUriDetails = (
 ): CampaignUriDetails => {
   return {
     creator: campaign.creatorId,
-    execData: campaign.execDate as unknown as number,
+    execDate: campaign.execDate as unknown as number,
     nonce: campaign.nonce,
     strategyID: campaign.stratID as StrategyID,
     strategyParams: JSON.parse(campaign.stratParamsStr),

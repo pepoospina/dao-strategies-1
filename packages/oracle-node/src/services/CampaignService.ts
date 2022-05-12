@@ -4,9 +4,15 @@ import {
   StrategyID,
 } from '@dao-strategies/core';
 import { Campaign, Prisma } from '@prisma/client';
+import { resimulationPeriod } from '../config';
 
 import { CampaignRepository } from '../repositories/campaignRepository';
-import { campaignToUriDetails, CampaignUriDetails } from './CampaignUri';
+import {
+  campaignToUriDetails,
+  CampaignUriDetails,
+  getCampaignUri,
+} from './CampaignUri';
+import { TimeService } from './TimeService';
 
 /**
  * On Retroactive Campaign
@@ -27,60 +33,97 @@ import { campaignToUriDetails, CampaignUriDetails } from './CampaignUri';
 export class CampaignService {
   constructor(
     protected campaignRepo: CampaignRepository,
+    protected timeService: TimeService,
     protected strategyComputation: StrategyComputation
   ) {}
 
-  /** A campaign is considered created once its smart contract is deployed. This endpoint
-   * informs the oracle node about the existence of such a campaign. Once registered
-   * the oracle will execute the campaign at the execution time (if in the future) and
-   * set the merkleRoot after the grace period */
-  async register(newCampaign: Prisma.CampaignCreateInput) {
-    await this.campaignRepo.create(newCampaign);
+  async get(uri: string): Promise<Campaign | undefined> {
+    return this.campaignRepo.get(uri);
   }
 
-  /** This endpoint "executes" a campaign, immediately running its strategy, and settings its
-   * rewards. This method is expected to be called only once per campaign at exactly the executionDate.
-   */
-  async execute(uri: string): Promise<void> {
-    const campaign = await this.campaignRepo.get(uri);
-
-    const params = JSON.parse(campaign.stratParamsStr);
-    const rewards = await this.strategyComputation.runStrategy(
-      campaign.stratID as StrategyID,
-      params
-    );
+  async exist(uri: string): Promise<boolean> {
+    return this.campaignRepo.exist(uri);
   }
 
-  async simulate(strategyId: StrategyID, strategyParams: any) {
+  async getOrCreateCampaign(
+    details: CampaignUriDetails,
+    by: string
+  ): Promise<string> {
+    const uri = await getCampaignUri(details);
+    const exist = await this.exist(uri);
+
+    if (!exist) {
+      const createData: Prisma.CampaignCreateInput = {
+        uri,
+        title: '',
+        description: '',
+        creator: {
+          connect: {
+            address: by,
+          },
+        },
+        nonce: details.nonce,
+        guardian: '',
+        oracle: '',
+        execDate: details.execDate,
+        cancelDate: 0,
+        stratID: details.strategyID,
+        stratParamsStr: JSON.stringify(details.strategyParams),
+        lastSimDate: this.timeService.now(),
+      };
+
+      this.create(details);
+    }
+  }
+
+  async create(details: Prisma.CampaignCreateInput) {
+    this.campaignRepo.create(details);
+  }
+
+  /**
+   * A "cached" execution of a campaign from its URI.
+   *
+   * A retroactive campaign is executed only once, since it's result
+   * is not expected to depend on the execution date. Once executed,
+   * a retroactive campaign is never re-executed.
+   *
+   * An open campaign (non-retroactive) is also expected to be executed
+   * only once and in a future date, but it can be "simulated" many times
+   * before then.
+   *
+   * If a campaign was recently simulated, it is not executed again,
+   * instead the last-computed simulated rewards are read from the DB and
+   * returned.
+   *
+   * */
+  async computeRewards(uri: string) {
+    /** check if this campaign was recently simulated */
+    const simDate = await this.getLastSimDate(uri);
+
+    let rewards: Balances;
+
+    if (
+      simDate !== undefined &&
+      this.timeService.getTime() - simDate > resimulationPeriod
+    ) {
+      rewards = await this.getRewards(uri);
+    } else {
+      const details = campaignToUriDetails(await this.get(uri));
+      rewards = await this.run(details.strategyID, details.strategyParams);
+
+      await this.setRewards(uri, rewards);
+    }
+
+    return rewards;
+  }
+
+  async run(strategyId: StrategyID, strategyParams: any) {
     const rewards = await this.strategyComputation.runStrategy(
       strategyId,
       strategyParams
     );
 
     return rewards;
-  }
-
-  async get(uri: string): Promise<Campaign | undefined> {
-    return this.campaignRepo.get(uri);
-  }
-
-  async validateOrGetDetails(
-    uri: string,
-    details?: CampaignUriDetails
-  ): Promise<CampaignUriDetails> {
-    let validDatails: CampaignUriDetails;
-
-    if (details === undefined) {
-      const readCampaign = await this.get(uri);
-      if (readCampaign === undefined) {
-        throw new Error(`details not provided nor found for campaiagn ${uri}`);
-      }
-      validDatails = campaignToUriDetails(readCampaign);
-    } else {
-      validDatails = details;
-    }
-
-    return validDatails;
   }
 
   async getLastSimDate(uri: string): Promise<number | undefined> {

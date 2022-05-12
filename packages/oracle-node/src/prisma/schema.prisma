@@ -22,6 +22,8 @@ model Campaign {
   stratParamsStr  String    // For now, Params are stringified as they can have any structure
   rewards         Reward[] 
   lastSimDate     BigInt
+  registered      Boolean   // Registered campaigns are those live (with a smart contract). 
+  address         String    // Smart contract address
 }
 
 enum CampaignState {
