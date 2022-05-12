@@ -15,14 +15,15 @@ const strategy: Strategy = async (
         throw new Error("time params incorrect: start must be smaller than end");
     }
 
-
     let reactionsPerContributor = new Map<string, Array<number>>();
-    let contributors = new Array<string | undefined>()
+    let contributors = new Array<string | undefined>() // convert to set
 
     // get all contributors in the repositories
     for (const repo of params.repositories) {
         let repoContributors = await getRepoContributors(world, repo);
-        contributors.concat(repoContributors);
+        for (const contributor of repoContributors) {
+            contributors.push(contributor);
+        }
     }
     contributors = [...new Set(contributors)]; // remove duplicates
 
@@ -34,21 +35,22 @@ const strategy: Strategy = async (
             if (pull.merged_at == null) {
                 return false;
             }
-            return (toTimeStamp(pull.created_at) >= params.timeRange.start &&
-                toTimeStamp(pull.created_at) <= params.timeRange.end &&
+            return (
                 toTimeStamp(pull.merged_at) >= params.timeRange.start &&
                 toTimeStamp(pull.merged_at) <= params.timeRange.end);
         });
 
         // get the amount of reactions on every pull request that was made by a contributor
         for (const pull of pullsFiltered) {
-            const pullCreator: string = pull.user.login;
-            let reactionsNum = 1; // every pull has one default reaction 
+            if (pull.user == null) {
+                continue;
+            }
+            const pullCreator = pull.user.login;
+            let reactionsNum = 0;
             const reactions = await getPullReactions(world, repo, pull.number);
             for (const reaction of reactions) {
-                if (reaction.user?.login != pullCreator && // reaction wasn't made by the creator of the pull
-                    contributors.includes(reaction.user?.login) && // only reactions by contributors
-                    reaction.content == '+1') { // only "thumbs up" reactions count
+                if (contributors.includes(reaction.user?.login) && // only reactions by contributors
+                    reaction.content == '+1') { // only "thumbs up" or "rocket" or "heart" or "celebration" reactions count
                     reactionsNum += 1;
                 }
             }
@@ -67,7 +69,7 @@ const strategy: Strategy = async (
         scores.set(contributor, Math.pow(reactions.reduce((partialSum, num) => partialSum + Math.pow(num, 2), 0), 1 / 2));
     }
 
-    return scores;
+    return scores; // need to normalize
 };
 
 export type { Params };
