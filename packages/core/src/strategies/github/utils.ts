@@ -1,23 +1,41 @@
-import { World } from '../../world/World';
-// import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
-// import { GetResponseTypeFromEndpointMethod } from "@octokit/types";
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 
-// type PullRequestParams = RestEndpointMethodTypes["pulls"]["get"]["response"]["data"];
+import { World } from '../../world/World';
+
+type PullRequestListData =
+  RestEndpointMethodTypes['pulls']['list']['response']['data'];
+
+type ReactionsListData =
+  RestEndpointMethodTypes['reactions']['listForIssue']['response']['data'];
 
 /*
 todo: get typing for the pulls. Tries using PullRequestParams but the type is not compatible with the returned pulls 
 from the iterator.
 https://github.com/octokit/plugin-rest-endpoint-methods.js#typescript 
 */
+
+export async function repoAvailable(
+  world: World,
+  repo: { owner: string; repo: string }
+): Promise<boolean> {
+  try {
+    await world.github.rest.repos.get({ ...repo });
+  } catch (e) {
+    return false;
+  }
+
+  return true;
+}
+
 export async function getPrsInRepo(
   world: World,
   repo: { owner: string; repo: string }
-) {
+): Promise<PullRequestListData> {
   if (!(await repoAvailable(world, repo))) {
     throw new Error(`repo ${repo.owner}\\${repo.repo} is not available`);
   }
 
-  const allPulls = [];
+  const allPulls: PullRequestListData = [];
   const iterator = world.github.paginate.iterator(
     world.github.rest.pulls.list,
     {
@@ -47,7 +65,7 @@ export async function getRepoContributors(
 
   const response = await world.github.rest.repos.listContributors({ ...repo });
 
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw new Error(
       `github api get request for contributors in repo ${repo.owner}\\${repo.repo} failed`
     );
@@ -60,7 +78,7 @@ export async function getPullReactions(
   world: World,
   repo: { owner: string; repo: string },
   pullNum: number
-) {
+): Promise<ReactionsListData> {
   if (!(await repoAvailable(world, repo))) {
     throw new Error(`repo ${repo.owner}\\${repo.repo} is not available`);
   }
@@ -70,7 +88,7 @@ export async function getPullReactions(
     issue_number: pullNum,
   });
 
-  if (response.status != 200) {
+  if (response.status !== 200) {
     throw new Error(
       `github api get request for pull request number ${pullNum} in repo ${repo.owner}\\${repo.repo} failed`
     );
@@ -78,19 +96,6 @@ export async function getPullReactions(
   return response.data;
 }
 
-export async function repoAvailable(
-  world: World,
-  repo: { owner: string; repo: string }
-) {
-  try {
-    await world.github.rest.repos.get({ ...repo });
-  } catch (e) {
-    return false;
-  }
-
-  return true;
-}
-
-export function toTimeStamp(date: string) {
+export function toTimeStamp(date: string): any {
   return new Date(date).getTime() / 1000;
 }

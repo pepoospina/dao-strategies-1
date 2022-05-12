@@ -1,6 +1,6 @@
 import { BigNumber, utils } from 'ethers';
 
-import MerkleTree from './merkleTree';
+import { MerkleTree } from './merkleTree';
 
 import { Balances } from '~~/types';
 

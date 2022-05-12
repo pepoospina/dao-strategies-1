@@ -49,9 +49,9 @@ const strategy: Strategy = async (world: World, params: Params) => {
       const reactions = await getPullReactions(world, repo, pull.number);
       for (const reaction of reactions) {
         if (
-          reaction.user?.login != pullCreator && // reaction wasn't made by the creator of the pull
+          reaction.user?.login !== pullCreator && // reaction wasn't made by the creator of the pull
           contributors.includes(reaction.user?.login) && // only reactions by contributors
-          reaction.content == '+1'
+          reaction.content === '+1'
         ) {
           // only "thumbs up" reactions count
           reactionsNum += 1;

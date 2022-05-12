@@ -2,7 +2,7 @@
 
 import { bufferToHex, keccak256 } from 'ethereumjs-util';
 
-export default class MerkleTree {
+export class MerkleTree {
   private readonly elements: Buffer[];
   private readonly bufferElementPositionIndex: { [hexElement: string]: number };
   private readonly layers: Buffer[][];
@@ -53,10 +53,10 @@ export default class MerkleTree {
   }
 
   static combinedHash(first?: Buffer, second?: Buffer): Buffer {
-    if (first == undefined) {
+    if (first === undefined) {
       return second as Buffer;
     }
-    if (second == undefined) {
+    if (second === undefined) {
       return first;
     }
 
